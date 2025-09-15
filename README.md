@@ -30,7 +30,7 @@ A full-stack Restaurant Management Application built with **ReactJS** for the fr
 ### Setup  
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/restaurant-management-system.git
+git clone https://github.com/Ryan-100/SEN201_Restaurant_Management_System.git
 
 # Frontend setup
 cd frontend
