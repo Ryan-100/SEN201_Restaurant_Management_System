@@ -1,4 +1,4 @@
-"Added by Team A" 
+"Added by Team A"
 “Team B edited here”
 This is a test readme file for lab 6.
 
