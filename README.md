@@ -1,42 +1,16 @@
-# Restaurant Management System  
+# React + Vite
 
-A full-stack Restaurant Management Application built with **ReactJS** for the frontend and **Go (Goland)** for the backend. The system helps small restaurants streamline order processing, billing, menu management, and kitchen notifications with a modular and scalable architecture.  
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
----
+Currently, two official plugins are available:
 
-## ✨ Features  
-- **Order Management**: Place, update, and cancel orders linked to table bills.  
-- **Menu Management**: Add, update, or remove dishes.  
-- **Billing**: Automatic bill calculation per table with adjustments.  
-- **Kitchen Workflow**: Real-time notifications for ready dishes/orders.  
-- **Role-Based Access**: Manager, Server, and Cook roles with distinct UIs.  
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
----
+## React Compiler
 
-## 🛠️ Tech Stack  
-- **Frontend**: ReactJS  
-- **Backend**: Go (Goland)  
-- **Database**: Local DB (future extension: PostgreSQL/MySQL)  
-- **Architecture**: REST API, layered services, data models  
+The React Compiler is currently not compatible with SWC. See [this issue](https://github.com/vitejs/vite-plugin-react/issues/428) for tracking the progress.
 
----
+## Expanding the ESLint configuration
 
-## 🚀 Getting Started  
-
-### Prerequisites  
-- Node.js & npm  
-- Go (1.20+)  
-
-### Setup  
-```bash
-# Clone the repository
-git clone https://github.com/Ryan-100/SEN201_Restaurant_Management_System.git
-
-# Frontend setup
-cd frontend
-npm install
-npm start
-
-# Backend setup
-cd backend
-go run main.go
+If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
