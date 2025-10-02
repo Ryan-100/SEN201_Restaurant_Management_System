@@ -1,16 +1,38 @@
-# React + Vite
+# Restaurant Management System  
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A full-stack Restaurant Management Application built with **ReactJS**. The system helps small restaurants streamline order processing, billing, menu management, and kitchen notifications with a modular and scalable architecture.  
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## ✨ Features  
+- **Order Management**: Place, update, and cancel orders linked to table bills.  
+- **Menu Management**: Add, update, or remove dishes.  
+- **Billing**: Automatic bill calculation per table with adjustments.  
+- **Kitchen Workflow**: Real-time notifications for ready dishes/orders.  
+- **Role-Based Access**: Manager, Server, and Cook roles with distinct UIs.  
 
-## React Compiler
+---
 
-The React Compiler is currently not compatible with SWC. See [this issue](https://github.com/vitejs/vite-plugin-react/issues/428) for tracking the progress.
+## 🛠️ Tech Stack  
+- **Frontend**: ReactJS  
+- **Database**: LocalStroage 
+- **Architecture**: REST API, layered services, data models  
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## 🚀 Getting Started  
+
+### Prerequisites  
+- Node.js & npm  
+
+### Setup  
+```bash
+# Clone the repository
+git clone https://github.com/Ryan-100/SEN201_Restaurant_Management_System.git
+
+# Project setup and start the dev
+npm install
+npm run dev
+
+# To build the app
+npm run build
