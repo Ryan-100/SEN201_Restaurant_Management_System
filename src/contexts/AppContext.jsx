@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useCallback } from 'react';
+import React, { createContext, useContext, useCallback, useState } from 'react';
 import useLocalStorage from '../hooks/useLocalStorage';
 
 const initialMenu = [
@@ -24,6 +24,8 @@ const AppContext = createContext(undefined);
 export const AppProvider = ({ children }) => {
     const [menu, setMenu] = useLocalStorage('restaurant-menu', initialMenu);
     const [orders, setOrders] = useLocalStorage('restaurant-orders', []);
+    const [cookNotifications, setCookNotifications] = useState([]); // For cook
+    const [serverNotifications, setServerNotifications] = useState([]); // For server
 
     const addMenuItem = useCallback((item) => {
         setMenu(prev => [...prev, { ...item, id: Date.now().toString() }]);
@@ -37,26 +39,56 @@ export const AppProvider = ({ children }) => {
         setMenu(prev => prev.filter(item => item.id !== itemId));
     }, [setMenu]);
 
+    const addCookNotification = useCallback((message) => {
+        const id = Date.now().toString();
+        setCookNotifications(prev => [...prev, {id, message}]);
+        setTimeout(() => {
+            setCookNotifications(prev => prev.filter(n => n.id !== id));
+        }, 5000);
+    }, []);
+
+    const addServerNotification = useCallback((message) => {
+        const id = Date.now().toString();
+        setServerNotifications(prev => [...prev, {id, message}]);
+        setTimeout(() => {
+            setServerNotifications(prev => prev.filter(n => n.id !== id));
+        }, 5000);
+    }, []);
+
     const placeOrder = useCallback((tableNumber, items) => {
         setOrders(prev => {
             const existingOrderIndex = prev.findIndex(o => o.tableNumber === tableNumber && o.status === OrderStatus.Active);
+            
+            const itemsWithUniqueIds = items.map(item => ({
+                ...item,
+                id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+            }));
+            
             if (existingOrderIndex > -1) {
                 const updatedOrders = [...prev];
                 const existingOrder = updatedOrders[existingOrderIndex];
-                updatedOrders[existingOrderIndex] = { ...existingOrder, items: [...existingOrder.items, ...items] };
+                updatedOrders[existingOrderIndex] = { 
+                    ...existingOrder, 
+                    items: [...existingOrder.items, ...itemsWithUniqueIds] 
+                };
                 return updatedOrders;
             } else {
                 const newOrder = {
                     id: `T${tableNumber}-${Date.now()}`,
                     tableNumber,
-                    items,
+                    items: itemsWithUniqueIds,
                     status: OrderStatus.Active,
                     createdAt: Date.now(),
                 };
                 return [...prev, newOrder];
             }
         });
-    }, [setOrders]);
+
+        addCookNotification(`New order for table ${tableNumber}!`); // Notify cook
+    }, [setOrders, addCookNotification]);
+
+
+    
 
     const updateOrderItemStatus = useCallback((orderId, orderItemId, status) => {
         setOrders(prev => prev.map(order => {
@@ -71,6 +103,12 @@ export const AppProvider = ({ children }) => {
             return order;
         }));
     }, [setOrders]);
+
+    const markItemReady = useCallback((orderId, orderItemId) => {
+        // Add this new function or update your existing one
+        updateOrderItemStatus(orderId, orderItemId, 'Ready');
+        addServerNotification(`Item ready for pickup!`); // Notify server
+    }, [updateOrderItemStatus, addServerNotification]);
 
     const cancelOrderItem = useCallback((orderId, orderItemId) => {
         updateOrderItemStatus(orderId, orderItemId, OrderItemStatus.Cancelled);
@@ -95,6 +133,11 @@ export const AppProvider = ({ children }) => {
         cancelOrderItem,
         updateOrderItemStatus,
         deliverBill,
+        cookNotifications,
+        serverNotifications,
+        addCookNotification,
+        addServerNotification,
+        markItemReady,
     };
 
     return (
