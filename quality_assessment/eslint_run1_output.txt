@@ -134,3 +134,34 @@
   10:7  error  'React' must be in scope when using JSX  react/react-in-jsx-scope
 
 ✖ 113 problems (113 errors, 0 warnings)
+
+---Ryan---
+C:\CMKL\Sophomore\Software Engineering\SEN201_Restaurant_Management_System\src\components\ui\Card.jsx
+  3:17  error  'children' is missing in props validation   react/prop-types
+  3:27  error  'className' is missing in props validation  react/prop-types
+
+C:\CMKL\Sophomore\Software Engineering\SEN201_Restaurant_Management_System\src\components\ui\Modal.jsx
+  20:18  error  'isOpen' is missing in props validation    react/prop-types
+  20:26  error  'onClose' is missing in props validation   react/prop-types
+  20:35  error  'children' is missing in props validation  react/prop-types
+
+C:\CMKL\Sophomore\Software Engineering\SEN201_Restaurant_Management_System\src\components\ui\ModalServer.jsx
+  14:3  error  'isOpen' is missing in props validation            react/prop-types
+  15:3  error  'onClose' is missing in props validation           react/prop-types
+  16:3  error  'tableNumber' is missing in props validation       react/prop-types
+  17:3  error  'menuItems' is missing in props validation         react/prop-types
+  18:3  error  'orderItems' is missing in props validation        react/prop-types
+  19:3  error  'onAddItem' is missing in props validation         react/prop-types
+  20:3  error  'onUpdateQuantity' is missing in props validation  react/prop-types
+  21:3  error  'onRemoveItem' is missing in props validation      react/prop-types
+  22:3  error  'onSubmitOrder' is missing in props validation     react/prop-types
+
+C:\CMKL\Sophomore\Software Engineering\SEN201_Restaurant_Management_System\src\components\ui\shared\Notification.jsx
+  4:25  error  'type' is missing in props validation  react/prop-types
+
+C:\CMKL\Sophomore\Software Engineering\SEN201_Restaurant_Management_System\src\contexts\AppContext.jsx
+  24:31  error  'children' is missing in props validation  react/prop-types
+
+✖ 16 problems (16 errors, 0 warnings)
+
+

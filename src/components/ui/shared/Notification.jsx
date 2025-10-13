@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from "react";
+import PropTypes from "prop-types";
 import { useAppContext } from '../../../contexts/AppContext';
 
 const Notification = ({ type = 'cook' }) => { // Add type prop
@@ -30,3 +31,7 @@ const Notification = ({ type = 'cook' }) => { // Add type prop
 };
 
 export default Notification;
+
+Notification.propTypes = {
+    type: PropTypes.oneOf(["cook", "server"]),
+};
