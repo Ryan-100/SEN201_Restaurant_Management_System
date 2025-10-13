@@ -13,13 +13,13 @@ import Card from '../../ui/Card'
 import ModalServer from '../../ui/ModalServer'
 
 const ServerView = () => {
-  const { menu, orders, placeOrder, deliverBill } = useAppContext()
+  const { menu, orders, placeOrder, deliverBill, updateOrderItemStatus } = useAppContext()
   
   const [selectedTable, setSelectedTable] = useState(null)
   const [isOrderModalOpen, setIsOrderModalOpen] = useState(false)
   const [currentOrderItems, setCurrentOrderItems] = useState([])
   
-  const TOTAL_TABLES = 10
+  const TOTAL_TABLES = 12
 
   const activeOrders = useMemo(() => 
     orders.filter(order => order.status === 'Active'),
@@ -30,6 +30,22 @@ const ServerView = () => {
     new Set(activeOrders.map(order => order.tableNumber)),
     [activeOrders]
   )
+
+  const readyItems = useMemo(() => {
+    const items = []
+    activeOrders.forEach(order => {
+      order.items.forEach(item => {
+        if (item.status === 'Ready') {
+          items.push({
+            ...item,
+            tableNumber: order.tableNumber,
+            orderId: order.id
+          })
+        }
+      })
+    })
+    return items
+  }, [activeOrders])
 
   const handleTableSelect = (tableNumber) => {
     setSelectedTable(tableNumber)
@@ -105,6 +121,14 @@ const ServerView = () => {
     deliverBill(orderId)
   }
 
+  const handleServeItem = (orderId, itemId) => {
+    updateOrderItemStatus(orderId, itemId, 'Served')
+  }
+
+  const canDeliverBill = (order) => {
+    return order.items.every(item => item.status === 'Served')
+  }
+
   const calculateOrderTotal = (orderItems) => {
     return orderItems.reduce((total, item) => 
       total + (item.price * (item.quantity || 1)), 0
@@ -120,18 +144,20 @@ const ServerView = () => {
           <p className="text-gray-600 mt-1">Select a table to take or edit orders</p>
         </div>
 
-        <div className="mb-8">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4">Tables</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+        <div className="flex gap-6">
+          <div className="flex-1">
+            <div className="mb-8">
+              <h2 className="text-xl font-semibold text-gray-800 mb-4">Tables</h2>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
             {Array.from({ length: TOTAL_TABLES }, (_, i) => i + 1).map(tableNumber => {
               const isOccupied = occupiedTables.has(tableNumber)
               const isSelected = selectedTable === tableNumber
               
-              let cardStyle = 'bg-green-50 hover:bg-green-100 border-2 border-green-500'
+              let cardStyle = 'bg-green-500 hover:bg-green-600 text-white'
               if (isSelected) {
                 cardStyle = 'bg-blue-600 text-white ring-4 ring-blue-300'
               } else if (isOccupied) {
-                cardStyle = 'bg-red-50 hover:bg-red-100 border-2 border-red-500'
+                cardStyle = 'bg-red-500 hover:bg-red-600 text-white'
               }
               
               let statusText = 'Available'
@@ -142,50 +168,46 @@ const ServerView = () => {
               }
               
               return (
-                <Card 
-                  key={tableNumber} 
-                  className={`cursor-pointer text-center transition-all duration-150 ${cardStyle}`}
+                <button
+                  key={tableNumber}
+                  onClick={() => handleTableSelect(tableNumber)}
+                  className={`rounded-lg shadow-md p-6 text-center transition-all duration-150 ${cardStyle}`}
                 >
-                  <button 
-                    onClick={() => handleTableSelect(tableNumber)}
-                    className="w-full"
-                  >
-                    <div className="text-xl font-bold">Table {tableNumber}</div>
-                    <div className="text-sm mt-1">{statusText}</div>
-                  </button>
-                </Card>
+                  <div className="text-xl font-bold">Table {tableNumber}</div>
+                  <div className="text-sm mt-1">{statusText}</div>
+                </button>
               )
             })}
-          </div>
-        </div>
+              </div>
+            </div>
 
-        <div>
-          <h2 className="text-xl font-semibold text-gray-800 mb-4">
-            Active Bills ({activeOrders.length})
-          </h2>
-          
-          {activeOrders.length === 0 ? (
-            <Card className="text-center py-4">
-              <p className="text-gray-500">No active orders</p>
-              <p className="text-sm text-gray-400 mt-2">
-                Select a table above to start a new order
-              </p>
-            </Card>
-          ) : (
-            <div className="space-y-3">
-              {activeOrders.map(order => {
-                const orderTotal = calculateOrderTotal(order.items)
-                const itemCount = order.items?.length || 0
-                
-                return (
-                  <Card key={order.id} className="p-4">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <div className="font-semibold text-lg">Table {order.tableNumber}</div>
-                        <div className="text-sm text-gray-600">
-                          {itemCount} item{itemCount !== 1 ? 's' : ''} | Total: ${orderTotal.toFixed(2)}
-                        </div>
-                      </div>
+            <div>
+              <h2 className="text-xl font-semibold text-gray-800 mb-4">
+                Active Bills ({activeOrders.length})
+              </h2>
+              
+              {activeOrders.length === 0 ? (
+                <Card className="text-center py-4">
+                  <p className="text-gray-500">No active orders</p>
+                  <p className="text-sm text-gray-400 mt-2">
+                    Select a table above to start a new order
+                  </p>
+                </Card>
+              ) : (
+                <div className="space-y-3">
+                  {activeOrders.map(order => {
+                    const orderTotal = calculateOrderTotal(order.items)
+                    const itemCount = order.items?.length || 0
+                    
+                    return (
+                      <Card key={order.id} className="p-4">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <div className="font-semibold text-lg">Table {order.tableNumber}</div>
+                            <div className="text-sm text-gray-600">
+                              {itemCount} item{itemCount !== 1 ? 's' : ''} | Total: ${orderTotal.toFixed(2)}
+                            </div>
+                          </div>
                       <div className="flex space-x-2">
                         <Button 
                           variant="secondary"
@@ -197,17 +219,53 @@ const ServerView = () => {
                         <Button 
                           variant="success"
                           onClick={() => handleDeliverBill(order.id)}
+                          disabled={!canDeliverBill(order)}
                           className="text-sm px-3 py-1"
                         >
                           Deliver Bill
                         </Button>
                       </div>
-                    </div>
-                  </Card>
-                )
-              })}
+                        </div>
+                      </Card>
+                    )
+                  })}
+                </div>
+              )}
             </div>
-          )}
+          </div>
+
+          <div className="w-96">
+            <Card className="sticky top-6">
+              <h2 className="text-xl font-semibold text-gray-800 mb-4">Ready for Pickup</h2>
+              
+              {readyItems.length === 0 ? (
+                <p className="text-gray-500 text-center py-8">No items are ready.</p>
+              ) : (
+                <div className="space-y-3 max-h-[calc(100vh-200px)] overflow-y-auto">
+                  {readyItems.map(item => (
+                    <div 
+                      key={`${item.orderId}-${item.id}`}
+                      className="bg-yellow-50 border-l-4 border-yellow-500 p-3 rounded-lg"
+                    >
+                      <div className="flex justify-between items-start gap-3">
+                        <div className="flex-1">
+                          <div className="font-semibold text-gray-800">{item.name}</div>
+                          <div className="text-sm text-gray-600">For Table {item.tableNumber}</div>
+                        </div>
+                        <Button 
+                          variant="success"
+                          onClick={() => handleServeItem(item.orderId, item.id)}
+                          className="text-sm px-3 py-1 whitespace-nowrap"
+                        >
+                          Serve
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </Card>
+          </div>
         </div>
       </div>
 
