@@ -7,6 +7,7 @@
  */
 
 import React from 'react';
+import PropTypes from 'prop-types';
 
 /**
  * Renders a modal overlay with content.
@@ -38,3 +39,9 @@ const Modal = ({ isOpen, onClose, children }) => {
 };
 
 export default Modal;
+
+Modal.propTypes = {
+  isOpen: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
+  children: PropTypes.node,
+};

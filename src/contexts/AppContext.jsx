@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useCallback, useState } from 'react';
+import PropTypes from 'prop-types';
 import useLocalStorage from '../hooks/useLocalStorage';
 
 const initialMenu = [
@@ -145,6 +146,10 @@ export const AppProvider = ({ children }) => {
             {children}
         </AppContext.Provider>
     );
+};
+
+AppProvider.propTypes = {
+    children: PropTypes.node,
 };
 
 export const useAppContext = () => {
