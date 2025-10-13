@@ -2,14 +2,23 @@ import React from 'react'
 import Card from '../../ui/Card'
 import Button from '../../ui/Button'
 import { useAppContext } from '../../../contexts/AppContext'
+import ServerNotification from '../../ui/shared/ServerNotification'
 
 const CookView = () => {
-  const { orders, cancelOrderItem, updateOrderItemStatus } = useAppContext()
+  const { orders, cancelOrderItem, updateOrderItemStatus, markItemReady } = useAppContext()
 
-  const activeOrders = (orders || []).filter(o => o.status === 'Active')
+  const activeOrders = (orders || []).filter(o => {
+    if (o.status !== 'Active') return false;
+    
+    // Check if all items in the order are ready
+    const allItemsReady = (o.items || []).every(item => item.status === 'Ready');
+    
+    // Only show orders that have items that are NOT all ready
+    return !allItemsReady;
+  })
 
   const handleMarkReady = (orderId, itemId) => {
-    updateOrderItemStatus(orderId, itemId, 'Ready')
+    markItemReady(orderId, itemId) // This will trigger server notification
   }
 
   return (
@@ -81,6 +90,7 @@ const CookView = () => {
           ))}
         </div>
       )}
+      <ServerNotification />
     </div>
   )
 }
