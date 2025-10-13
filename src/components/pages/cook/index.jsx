@@ -5,7 +5,7 @@ import { useAppContext } from '../../../contexts/AppContext'
 import ServerNotification from '../../ui/shared/ServerNotification'
 
 const CookView = () => {
-  const { orders, cancelOrderItem, updateOrderItemStatus, markItemReady } = useAppContext()
+  const { orders, cancelOrderItem, markItemReady } = useAppContext()
 
   const activeOrders = (orders || []).filter(o => {
     if (o.status !== 'Active') return false;
