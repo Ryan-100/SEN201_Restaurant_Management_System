@@ -7,6 +7,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
 
 /**
  * Renders a form for adding or editing a menu item.
@@ -102,6 +103,17 @@ const MenuForm = ({ onSubmit, onClose, itemToEdit = null }) => {
       </div>
     </form>
   );
+};
+
+MenuForm.propTypes = {
+  onSubmit: PropTypes.func.isRequired,
+  onClose: PropTypes.func.isRequired,
+  itemToEdit: PropTypes.shape({
+    name: PropTypes.string,
+    description: PropTypes.string,
+    price: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    category: PropTypes.oneOf(['Appetizer', 'Main', 'Dessert', 'Beverage']),
+  }),
 };
 
 export default MenuForm;
