@@ -7,6 +7,7 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import Button from './Button'
 import Card from './Card'
 
@@ -154,4 +155,25 @@ const ModalServer = ({
 }
 
 export default ModalServer
+
+ModalServer.propTypes = {
+  isOpen: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
+  tableNumber: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
+  menuItems: PropTypes.arrayOf(PropTypes.shape({
+    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+    name: PropTypes.string.isRequired,
+    price: PropTypes.number.isRequired,
+  })).isRequired,
+  orderItems: PropTypes.arrayOf(PropTypes.shape({
+    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+    name: PropTypes.string.isRequired,
+    price: PropTypes.number.isRequired,
+    quantity: PropTypes.number.isRequired,
+  })).isRequired,
+  onAddItem: PropTypes.func.isRequired,
+  onUpdateQuantity: PropTypes.func.isRequired,
+  onRemoveItem: PropTypes.func.isRequired,
+  onSubmitOrder: PropTypes.func.isRequired,
+}
 
