@@ -12,6 +12,14 @@ import Button from '../../ui/Button'
 import Card from '../../ui/Card'
 import ModalServer from '../../ui/ModalServer'
 
+/**
+ * Server dashboard for managing restaurant tables and orders
+ *
+ * Props: None
+ *
+ * Returns: JSX element containing server interface with table management,
+ * order taking modal, active bills, and ready-for-pickup section
+ */
 const ServerView = () => {
   const { menu, orders, placeOrder, deliverBill, updateOrderItemStatus } = useAppContext()
   
