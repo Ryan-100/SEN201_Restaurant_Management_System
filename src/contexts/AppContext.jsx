@@ -16,7 +16,6 @@ const OrderStatus = {
 
 const OrderItemStatus = {
     Cancelled: 'Cancelled',
-    // Add other statuses as needed
 };
 
 const AppContext = createContext(undefined);
@@ -78,9 +77,7 @@ export const AppProvider = ({ children }) => {
     const updateOrder = useCallback((orderId, items) => {
         setOrders(prev => prev.map(order => {
             if (order.id === orderId) {
-                // Replace items but keep existing unique IDs for items that already exist
                 const updatedItems = items.map(item => {
-                    // If item has existing unique ID, keep it; otherwise create new one
                     const existingItem = order.items.find(existingItem => 
                         existingItem.menuItemId === item.menuItemId && 
                         existingItem.notes === item.notes
@@ -119,7 +116,6 @@ export const AppProvider = ({ children }) => {
     }, [setOrders]);
 
     const markItemReady = useCallback((orderId, orderItemId) => {
-        // Add this new function or update your existing one
         updateOrderItemStatus(orderId, orderItemId, 'Ready');
         addServerNotification(`Item ready for pickup!`); // Notify server
     }, [updateOrderItemStatus, addServerNotification]);

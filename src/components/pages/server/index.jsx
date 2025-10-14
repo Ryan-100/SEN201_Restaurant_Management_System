@@ -111,10 +111,8 @@ const ServerView = () => {
   const handleSubmitOrder = () => {
     if (currentOrderItems.length > 0 && selectedTable) {
       if (currentOrderId) {
-        // Editing existing order
         updateOrder(currentOrderId, currentOrderItems)
       } else {
-        // Creating new order
         placeOrder(selectedTable, currentOrderItems)
       }
       handleCloseModal()
