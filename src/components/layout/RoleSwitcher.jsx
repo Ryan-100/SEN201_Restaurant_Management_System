@@ -1,7 +1,22 @@
+/*
+ * RoleSwitcher.jsx
+ *
+ * Navigation component that allows users to switch between different role-based views
+ * (Manager, Server, Cook, Test) in the restaurant management system.
+ *
+ * Created by Ryan, 29 September 2025
+ */
+
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
+
 import { Role } from "../../data/role";
 
+/*
+ * Role switcher navigation component
+ *
+ * Returns: JSX element containing role-based navigation buttons
+ */
 const RoleSwitcher = () => {
     const location = useLocation();
     const roles = [Role.Manager, Role.Server, Role.Cook, Role.Test];
@@ -13,32 +28,32 @@ const RoleSwitcher = () => {
         [Role.Test]: { bgColor: 'bg-purple-600', hoverBgColor: 'hover:bg-purple-700', icon: 'M14 10V3L4 14h7v7l9-11h-7z', path: '/test' },
     };
 
-    return (
-        <div className="bg-gray-800 text-white p-4 flex justify-between items-center shadow-lg">
-            <div className="flex items-center">
-                <h1 className="text-2xl font-bold tracking-wider">Restaurant POS</h1>
-            </div>
-            <div className="flex items-center space-x-2">
-                <span className="text-sm font-medium mr-2">SWITCH ROLE:</span>
-                {roles.map((role) => {
-                    const { bgColor, hoverBgColor, icon, path } = roleConfig[role];
-                    const isActive = location.pathname === path;
-                    return (
-                        <Link
-                            key={role}
-                            to={path}
-                            className={`flex items-center px-4 py-2 rounded-md font-semibold transition-all duration-300 transform ${isActive ? `${bgColor} scale-105 shadow-md` : `bg-gray-700 ${hoverBgColor} hover:scale-105`}`}
-                        >
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                                <path fillRule="evenodd" d={icon} clipRule="evenodd" />
-                            </svg>
-                            {role}
-                        </Link>
-                    );
-                })}
-            </div>
-        </div>
-    );
+  return (
+    <div className="bg-gray-800 text-white p-4 flex justify-between items-center shadow-lg">
+      <div className="flex items-center">
+        <h1 className="text-2xl font-bold tracking-wider">Restaurant POS</h1>
+      </div>
+      <div className="flex items-center space-x-2">
+        <span className="text-sm font-medium mr-2">SWITCH ROLE:</span>
+        {roles.map((role) => {
+          const { bgColor, hoverBgColor, icon, path } = roleConfig[role];
+          const isActive = location.pathname === path;
+          return (
+            <Link
+              key={role}
+              to={path}
+              className={`flex items-center px-4 py-2 rounded-md font-semibold transition-all duration-300 transform ${isActive ? `${bgColor} scale-105 shadow-md` : `bg-gray-700 ${hoverBgColor} hover:scale-105`}`}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d={icon} clipRule="evenodd" />
+              </svg>
+              {role}
+            </Link>
+          );
+        })}
+      </div>
+    </div>
+  );
 };
 
 export default RoleSwitcher;
