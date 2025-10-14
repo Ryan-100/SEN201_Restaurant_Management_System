@@ -21,11 +21,12 @@ import ModalServer from '../../ui/ModalServer'
  * order taking modal, active bills, and ready-for-pickup section
  */
 const ServerView = () => {
-  const { menu, orders, placeOrder, deliverBill, updateOrderItemStatus } = useAppContext()
+  const { menu, orders, placeOrder, updateOrder, deliverBill, updateOrderItemStatus } = useAppContext()
   
   const [selectedTable, setSelectedTable] = useState(null)
   const [isOrderModalOpen, setIsOrderModalOpen] = useState(false)
   const [currentOrderItems, setCurrentOrderItems] = useState([])
+  const [currentOrderId, setCurrentOrderId] = useState(null)
   
   const TOTAL_TABLES = 12
 
@@ -60,11 +61,13 @@ const ServerView = () => {
     const existingOrder = activeOrders.find(order => order.tableNumber === tableNumber)
     
     if (existingOrder) {
+      setCurrentOrderId(existingOrder.id)
       setCurrentOrderItems(existingOrder.items.map(item => ({
         ...item,
         quantity: item.quantity || 1
       })))
     } else {
+      setCurrentOrderId(null)
       setCurrentOrderItems([])
     }
     
@@ -107,7 +110,13 @@ const ServerView = () => {
 
   const handleSubmitOrder = () => {
     if (currentOrderItems.length > 0 && selectedTable) {
-      placeOrder(selectedTable, currentOrderItems)
+      if (currentOrderId) {
+        // Editing existing order
+        updateOrder(currentOrderId, currentOrderItems)
+      } else {
+        // Creating new order
+        placeOrder(selectedTable, currentOrderItems)
+      }
       handleCloseModal()
     }
   }
@@ -116,6 +125,7 @@ const ServerView = () => {
     setIsOrderModalOpen(false)
     setSelectedTable(null)
     setCurrentOrderItems([])
+    setCurrentOrderId(null)
   }
 
   const handleViewEditOrder = (orderId) => {

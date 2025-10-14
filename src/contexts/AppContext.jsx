@@ -57,35 +57,49 @@ export const AppProvider = ({ children }) => {
 
     const placeOrder = useCallback((tableNumber, items) => {
         setOrders(prev => {
-            const existingOrderIndex = prev.findIndex(o => o.tableNumber === tableNumber && o.status === OrderStatus.Active);
-            
             const itemsWithUniqueIds = items.map(item => ({
                 ...item,
                 id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
             }));
             
-            if (existingOrderIndex > -1) {
-                const updatedOrders = [...prev];
-                const existingOrder = updatedOrders[existingOrderIndex];
-                updatedOrders[existingOrderIndex] = { 
-                    ...existingOrder, 
-                    items: [...existingOrder.items, ...itemsWithUniqueIds] 
-                };
-                return updatedOrders;
-            } else {
-                const newOrder = {
-                    id: `T${tableNumber}-${Date.now()}`,
-                    tableNumber,
-                    items: itemsWithUniqueIds,
-                    status: OrderStatus.Active,
-                    createdAt: Date.now(),
-                };
-                return [...prev, newOrder];
-            }
+            const newOrder = {
+                id: `T${tableNumber}-${Date.now()}`,
+                tableNumber,
+                items: itemsWithUniqueIds,
+                status: OrderStatus.Active,
+                createdAt: Date.now(),
+            };
+            return [...prev, newOrder];
         });
 
         addCookNotification(`New order for table ${tableNumber}!`); // Notify cook
     }, [setOrders, addCookNotification]);
+
+    const updateOrder = useCallback((orderId, items) => {
+        setOrders(prev => prev.map(order => {
+            if (order.id === orderId) {
+                // Replace items but keep existing unique IDs for items that already exist
+                const updatedItems = items.map(item => {
+                    // If item has existing unique ID, keep it; otherwise create new one
+                    const existingItem = order.items.find(existingItem => 
+                        existingItem.menuItemId === item.menuItemId && 
+                        existingItem.notes === item.notes
+                    );
+                    
+                    return {
+                        ...item,
+                        id: existingItem ? existingItem.id : `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+                    };
+                });
+                
+                return {
+                    ...order,
+                    items: updatedItems
+                };
+            }
+            return order;
+        }));
+    }, [setOrders]);
 
 
     
@@ -130,6 +144,7 @@ export const AppProvider = ({ children }) => {
         updateMenuItem,
         deleteMenuItem,
         placeOrder,
+        updateOrder,
         cancelOrderItem,
         updateOrderItemStatus,
         deliverBill,
