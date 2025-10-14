@@ -297,6 +297,7 @@ const ServerView = () => {
         onUpdateQuantity={handleUpdateQuantity}
         onRemoveItem={handleRemoveItem}
         onSubmitOrder={handleSubmitOrder}
+        isEditing={currentOrderId !== null}
       />
     </div>
   )

@@ -22,6 +22,7 @@ import Card from './Card'
  * onUpdateQuantity - function, callback to update item quantity
  * onRemoveItem - function, callback to remove item from order
  * onSubmitOrder - function, callback to submit the order
+ * isEditing - boolean, indicates if editing existing order
  *
  * Returns: JSX modal element for order management
  */
@@ -34,7 +35,8 @@ const ModalServer = ({
   onAddItem,
   onUpdateQuantity,
   onRemoveItem,
-  onSubmitOrder
+  onSubmitOrder,
+  isEditing = false
 }) => {
   if (!isOpen) return null
 
@@ -161,7 +163,7 @@ const ModalServer = ({
               className="px-6 py-2"
               disabled={orderItems.length === 0}
             >
-              {orderItems.length === 0 ? 'Add Items' : 'Submit Order'}
+              {orderItems.length === 0 ? 'Add Items' : (isEditing ? 'Update Order' : 'Submit Order')}
             </Button>
           </div>
         </div>
