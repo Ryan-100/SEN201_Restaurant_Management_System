@@ -81,15 +81,32 @@ export const AppProvider = ({ children }) => {
             const existingOrderIndex = prev.findIndex(o => o.tableNumber === tableNumber && o.status === OrderStatus.Active);
 
             if (existingOrderIndex > -1) {
+                // Order exists - use updateOrder logic instead
+                const existingOrder = prev[existingOrderIndex];
                 const updatedOrders = [...prev];
-                const existingOrder = updatedOrders[existingOrderIndex];
-                // Replace items with the newly submitted normalized list (edit behavior)
+                
+                // Preserve protected items (Accepted, Ready, Served)
+                const protectedItems = existingOrder.items.filter(item =>
+                    item.status === OrderItemStatus.Accepted ||
+                    item.status === 'Ready' ||
+                    item.status === 'Served'
+                );
+
+                // Combine protected items with new items
+                const newItemsToAdd = normalizedItems.filter(newItem =>
+                    !protectedItems.some(protectedItem =>
+                        protectedItem.name === newItem.name &&
+                        (protectedItem.notes || '') === (newItem.notes || '')
+                    )
+                );
+
                 updatedOrders[existingOrderIndex] = {
                     ...existingOrder,
-                    items: normalizedItems,
+                    items: [...protectedItems, ...newItemsToAdd]
                 };
                 return updatedOrders;
             } else {
+                // New order
                 const newOrder = {
                     id: `T${tableNumber}-${Date.now()}`,
                     tableNumber,
@@ -102,7 +119,7 @@ export const AppProvider = ({ children }) => {
         });
 
         addCookNotification(`New order for table ${tableNumber}!`); // Notify cook
-    }, [setOrders, addCookNotification]);
+    }, [setOrders, addCookNotification, OrderItemStatus]);
 
     const updateOrder = useCallback((orderId, itemsFromServer) => {
         setOrders(prev => prev.map(order => {
