@@ -63,7 +63,13 @@ const ServerView = () => {
     
     if (existingOrder) {
       setCurrentOrderId(existingOrder.id)
-      setCurrentOrderItems(existingOrder.items.map(item => ({
+      // Only load items that are NOT protected (not Accepted, Ready, or Served)
+      const editableItems = existingOrder.items.filter(item =>
+        item.status !== 'Accepted' &&
+        item.status !== 'Ready' &&
+        item.status !== 'Served'
+      )
+      setCurrentOrderItems(editableItems.map(item => ({
         ...item,
         quantity: item.quantity || 1,
         // Mark as already expanded so expandToPerUnitItems won't re-expand
