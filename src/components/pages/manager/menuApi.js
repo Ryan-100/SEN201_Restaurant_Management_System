@@ -10,6 +10,15 @@
 // Import the mock data from the central data directory
 import { menuItems } from '../../../data/menuItems';
 
+// Helper function to persist menu items to localStorage
+const saveMenuToLocalStorage = () => {
+  try {
+    window.localStorage.setItem('restaurant-menu', JSON.stringify(menuItems));
+  } catch (error) {
+    console.error('Failed to save menu to localStorage:', error);
+  }
+};
+
 /**
  * Fetches all menu items.
  * @returns {Promise<Array>} A promise that resolves to an array of menu items.
@@ -36,6 +45,7 @@ export const createMenuItem = async (itemData) => {
   };
   
   menuItems.push(newItem);
+  saveMenuToLocalStorage();
   return Promise.resolve(newItem);
 };
 
@@ -54,6 +64,7 @@ export const updateMenuItem = async (itemId, itemData) => {
 
   const updatedItem = { ...menuItems[itemIndex], ...itemData, price: parseFloat(itemData.price) };
   menuItems[itemIndex] = updatedItem;
+  saveMenuToLocalStorage();
   
   return Promise.resolve(updatedItem);
 };
@@ -73,6 +84,7 @@ export const deleteMenuItem = async (itemId) => {
   }
 
   menuItems.splice(itemIndex, 1);
+  saveMenuToLocalStorage();
   console.log("Item deleted successfully.");
   return Promise.resolve();
 };
