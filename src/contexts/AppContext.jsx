@@ -1,14 +1,10 @@
 import React, { createContext, useContext, useCallback, useState } from 'react';
 import PropTypes from 'prop-types';
 import useLocalStorage from '../hooks/useLocalStorage';
+import { menuItems as managerMenuItems } from '../data/menuItems';
 
-const initialMenu = [
-    { id: '1', name: 'Margherita Pizza', price: 12.99 },
-    { id: '2', name: 'Caesar Salad', price: 8.50 },
-    { id: '3', name: 'Spaghetti Carbonara', price: 15.00 },
-    { id: '4', name: 'Bruschetta', price: 6.75 },
-    { id: '5', name: 'Tiramisu', price: 7.00 },
-];
+// Use Manager's menu from data/menuItems.js as the source of truth
+const initialMenu = managerMenuItems;
 
 const OrderStatus = {
     Active: 'Active',
