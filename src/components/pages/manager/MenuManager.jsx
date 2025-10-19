@@ -11,6 +11,7 @@ import React, { useState, useEffect } from 'react';
 import { getMenuItems, createMenuItem, updateMenuItem, deleteMenuItem } from './menuApi';
 import Modal from '../../ui/Modal';
 import MenuForm from './MenuForm';
+import { useAppContext } from '../../../contexts/AppContext';
 
 /**
  * Manages and displays the list of menu items.
@@ -18,6 +19,7 @@ import MenuForm from './MenuForm';
  * @returns {React.ReactElement} JSX element containing the menu management UI.
  */
 const MenuManager = () => {
+  const { setAllMenuItems } = useAppContext();
   const [menuItems, setMenuItems] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -30,6 +32,7 @@ const MenuManager = () => {
       setIsLoading(true);
       const items = await getMenuItems();
       setMenuItems(items);
+      setAllMenuItems(items);
     } catch (err) {
       setError(err.message || 'Failed to load menu.');
     } finally {
