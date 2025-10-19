@@ -65,7 +65,9 @@ const ServerView = () => {
       setCurrentOrderId(existingOrder.id)
       setCurrentOrderItems(existingOrder.items.map(item => ({
         ...item,
-        quantity: item.quantity || 1
+        quantity: item.quantity || 1,
+        // Mark as already expanded so expandToPerUnitItems won't re-expand
+        alreadyExpanded: true
       })))
     } else {
       setCurrentOrderId(null)

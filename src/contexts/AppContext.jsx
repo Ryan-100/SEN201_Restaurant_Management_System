@@ -58,6 +58,19 @@ export const AppProvider = ({ children }) => {
         const expandToPerUnitItems = (list) => {
             const perUnit = [];
             list.forEach(srcItem => {
+                // Skip if item is already expanded
+                if (srcItem.alreadyExpanded) {
+                    perUnit.push({
+                        name: srcItem.name,
+                        price: srcItem.price,
+                        notes: srcItem.notes,
+                        status: srcItem.status,
+                        id: srcItem.id,
+                        // Remove the expansion flag
+                    });
+                    return;
+                }
+                
                 const quantity = Math.max(1, srcItem.quantity || 1);
                 for (let i = 0; i < quantity; i += 1) {
                     const preserveIdWhenSingle = quantity === 1 && srcItem.id && typeof srcItem.id !== 'undefined';
