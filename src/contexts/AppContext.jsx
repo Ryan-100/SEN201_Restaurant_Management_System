@@ -131,18 +131,28 @@ export const AppProvider = ({ children }) => {
                     item.status === 'Served'
                 );
 
-                // Combine protected items with new items from server
-                // Remove duplicates based on name + notes
+                // Keep unprotected items (pending, no status)
+                const unprotectedItems = order.items.filter(item =>
+                    item.status !== OrderItemStatus.Accepted &&
+                    item.status !== 'Ready' &&
+                    item.status !== 'Served'
+                );
+
+                // Combine all existing items (protected + unprotected)
+                const allExistingItems = [...protectedItems, ...unprotectedItems];
+
+                // Only add new items from server that aren't already there
+                // This prevents duplicates
                 const newItemsToAdd = itemsFromServer.filter(newItem =>
-                    !protectedItems.some(protectedItem =>
-                        protectedItem.name === newItem.name &&
-                        (protectedItem.notes || '') === (newItem.notes || '')
+                    !allExistingItems.some(existingItem =>
+                        existingItem.name === newItem.name &&
+                        (existingItem.notes || '') === (newItem.notes || '')
                     )
                 );
 
                 return {
                     ...order,
-                    items: [...protectedItems, ...newItemsToAdd]
+                    items: [...allExistingItems, ...newItemsToAdd]
                 };
             }
             return order;
