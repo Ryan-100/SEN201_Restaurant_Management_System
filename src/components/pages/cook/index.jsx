@@ -13,7 +13,7 @@ const CookView = () => {
     .map(order => ({
       ...order,
       items: (order.items || [])
-        .filter(item => item.status !== 'Ready' && item.status !== 'Cancelled')
+        .filter(item => item.status !== 'Ready' && item.status !== 'Cancelled' && item.status !== 'Served')
         .map(item => ({
           ...item,
           orderId: order.id,
