@@ -17,6 +17,7 @@ const OrderStatus = {
 
 const OrderItemStatus = {
     Cancelled: 'Cancelled',
+    Accepted: 'Accepted',
     // Add other statuses as needed
 };
 
@@ -57,27 +58,46 @@ export const AppProvider = ({ children }) => {
     }, []);
 
     const placeOrder = useCallback((tableNumber, items) => {
+        // Normalize incoming items: expand quantity into individual per-unit items
+        const expandToPerUnitItems = (list) => {
+            const perUnit = [];
+            list.forEach(srcItem => {
+                const quantity = Math.max(1, srcItem.quantity || 1);
+                for (let i = 0; i < quantity; i += 1) {
+                    const preserveIdWhenSingle = quantity === 1 && srcItem.id && typeof srcItem.id !== 'undefined';
+                    perUnit.push({
+                        name: srcItem.name,
+                        price: srcItem.price,
+                        notes: srcItem.notes,
+                        // Preserve existing status if provided (e.g., when editing), otherwise undefined
+                        status: srcItem.status,
+                        // Keep existing id if editing a single item; otherwise assign new unique id
+                        id: preserveIdWhenSingle ? srcItem.id : `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+                    });
+                }
+            });
+            return perUnit;
+        };
+
+        const normalizedItems = expandToPerUnitItems(items);
+
         setOrders(prev => {
             const existingOrderIndex = prev.findIndex(o => o.tableNumber === tableNumber && o.status === OrderStatus.Active);
-            
-            const itemsWithUniqueIds = items.map(item => ({
-                ...item,
-                id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
-            }));
-            
+
             if (existingOrderIndex > -1) {
                 const updatedOrders = [...prev];
                 const existingOrder = updatedOrders[existingOrderIndex];
-                updatedOrders[existingOrderIndex] = { 
-                    ...existingOrder, 
-                    items: [...existingOrder.items, ...itemsWithUniqueIds] 
+                // Replace items with the newly submitted normalized list (edit behavior)
+                updatedOrders[existingOrderIndex] = {
+                    ...existingOrder,
+                    items: normalizedItems,
                 };
                 return updatedOrders;
             } else {
                 const newOrder = {
                     id: `T${tableNumber}-${Date.now()}`,
                     tableNumber,
-                    items: itemsWithUniqueIds,
+                    items: normalizedItems,
                     status: OrderStatus.Active,
                     createdAt: Date.now(),
                 };
@@ -104,6 +124,10 @@ export const AppProvider = ({ children }) => {
             return order;
         }));
     }, [setOrders]);
+
+    const acceptOrderItem = useCallback((orderId, orderItemId) => {
+        updateOrderItemStatus(orderId, orderItemId, OrderItemStatus.Accepted);
+    }, [updateOrderItemStatus]);
 
     const markItemReady = useCallback((orderId, orderItemId) => {
         // Add this new function or update your existing one
@@ -139,6 +163,7 @@ export const AppProvider = ({ children }) => {
         addCookNotification,
         addServerNotification,
         markItemReady,
+        acceptOrderItem,
     };
 
     return (
