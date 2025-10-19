@@ -6,7 +6,7 @@ import CookNotification from '../../ui/shared/CookNotification';
 import ServerNotification from '../../ui/shared/ServerNotification';
 
 const TestInterface = () => {
-  const { placeOrder, menu, addCookNotification } = useAppContext();
+  const { placeOrder, menu } = useAppContext();
 
   const fakePlaceOrder = () => {
     const randomTable = Math.floor(Math.random() * 10) + 1;

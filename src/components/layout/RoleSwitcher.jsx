@@ -1,4 +1,6 @@
+import React from "react";
 import { Role } from "../../data/role";
+import PropTypes from "prop-types";
 
 const RoleSwitcher = ({ currentRole, onRoleChange }) => {
     const roles = [Role.Manager, Role.Server, Role.Cook, Role.Test];
@@ -39,3 +41,8 @@ const RoleSwitcher = ({ currentRole, onRoleChange }) => {
 };
 
 export default RoleSwitcher;
+
+RoleSwitcher.propTypes = {
+    currentRole: PropTypes.oneOf([Role.Manager, Role.Server, Role.Cook, Role.Test]).isRequired,
+    onRoleChange: PropTypes.func.isRequired,
+};
