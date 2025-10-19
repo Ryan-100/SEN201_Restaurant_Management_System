@@ -144,28 +144,25 @@ export const AppProvider = ({ children }) => {
                     item.status === 'Served'
                 );
 
-                // Keep unprotected items (pending, no status)
-                const unprotectedItems = order.items.filter(item =>
-                    item.status !== OrderItemStatus.Accepted &&
-                    item.status !== 'Ready' &&
-                    item.status !== 'Served'
-                );
+                // Remove alreadyExpanded flag from server items before merging
+                const cleanedServerItems = itemsFromServer.map(item => {
+                    const cleaned = { ...item };
+                    delete cleaned.alreadyExpanded;
+                    return cleaned;
+                });
 
-                // Combine all existing items (protected + unprotected)
-                const allExistingItems = [...protectedItems, ...unprotectedItems];
-
-                // Only add new items from server that aren't already there
-                // This prevents duplicates
-                const newItemsToAdd = itemsFromServer.filter(newItem =>
-                    !allExistingItems.some(existingItem =>
-                        existingItem.name === newItem.name &&
-                        (existingItem.notes || '') === (newItem.notes || '')
+                // Filter out protected items from the server items
+                // (server shouldn't be sending protected items anyway, but just in case)
+                const newItemsToAdd = cleanedServerItems.filter(newItem =>
+                    !protectedItems.some(protectedItem =>
+                        protectedItem.name === newItem.name &&
+                        (protectedItem.notes || '') === (newItem.notes || '')
                     )
                 );
 
                 return {
                     ...order,
-                    items: [...allExistingItems, ...newItemsToAdd]
+                    items: [...protectedItems, ...newItemsToAdd]
                 };
             }
             return order;
