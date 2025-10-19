@@ -104,6 +104,36 @@ export const AppProvider = ({ children }) => {
         addCookNotification(`New order for table ${tableNumber}!`); // Notify cook
     }, [setOrders, addCookNotification]);
 
+    const updateOrder = useCallback((orderId, itemsFromServer) => {
+        setOrders(prev => prev.map(order => {
+            if (order.id === orderId) {
+                // Preserve items that have protected statuses (Accepted, Ready, Served)
+                const protectedItems = order.items.filter(item =>
+                    item.status === OrderItemStatus.Accepted ||
+                    item.status === 'Ready' ||
+                    item.status === 'Served'
+                );
+
+                // Combine protected items with new items from server
+                // Remove duplicates based on name + notes
+                const newItemsToAdd = itemsFromServer.filter(newItem =>
+                    !protectedItems.some(protectedItem =>
+                        protectedItem.name === newItem.name &&
+                        (protectedItem.notes || '') === (newItem.notes || '')
+                    )
+                );
+
+                return {
+                    ...order,
+                    items: [...protectedItems, ...newItemsToAdd]
+                };
+            }
+            return order;
+        }));
+
+        addCookNotification(`Order updated for table!`);
+    }, [setOrders, addCookNotification]);
+
     const updateOrderItemStatus = useCallback((orderId, orderItemId, status) => {
         setOrders(prev => prev.map(order => {
             if (order.id === orderId) {
@@ -150,6 +180,7 @@ export const AppProvider = ({ children }) => {
         updateMenuItem,
         deleteMenuItem,
         placeOrder,
+        updateOrder,
         cancelOrderItem,
         updateOrderItemStatus,
         deliverBill,
