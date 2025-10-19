@@ -119,7 +119,7 @@ export const AppProvider = ({ children }) => {
         });
 
         addCookNotification(`New order for table ${tableNumber}!`); // Notify cook
-    }, [setOrders, addCookNotification, OrderItemStatus]);
+    }, [setOrders, addCookNotification]);
 
     const updateOrder = useCallback((orderId, itemsFromServer) => {
         setOrders(prev => prev.map(order => {
