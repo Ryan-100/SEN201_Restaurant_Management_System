@@ -137,32 +137,24 @@ export const AppProvider = ({ children }) => {
     const updateOrder = useCallback((orderId, itemsFromServer) => {
         setOrders(prev => prev.map(order => {
             if (order.id === orderId) {
-                // Preserve items that have protected statuses (Accepted, Ready, Served)
+                // Preserve ONLY items that have protected statuses (Accepted, Ready, Served)
                 const protectedItems = order.items.filter(item =>
                     item.status === OrderItemStatus.Accepted ||
                     item.status === 'Ready' ||
                     item.status === 'Served'
                 );
 
-                // Remove alreadyExpanded flag from server items before merging
+                // Clean server items (remove internal flags)
                 const cleanedServerItems = itemsFromServer.map(item => {
-                    const cleaned = { ...item };
-                    delete cleaned.alreadyExpanded;
-                    return cleaned;
+                    const { alreadyExpanded, ...rest } = item;
+                    return rest;
                 });
 
-                // Filter out protected items from the server items
-                // (server shouldn't be sending protected items anyway, but just in case)
-                const newItemsToAdd = cleanedServerItems.filter(newItem =>
-                    !protectedItems.some(protectedItem =>
-                        protectedItem.name === newItem.name &&
-                        (protectedItem.notes || '') === (newItem.notes || '')
-                    )
-                );
-
+                // Combine protected items with ALL server items
+                // Server items are the complete order state we want to keep
                 return {
                     ...order,
-                    items: [...protectedItems, ...newItemsToAdd]
+                    items: [...protectedItems, ...cleanedServerItems]
                 };
             }
             return order;
