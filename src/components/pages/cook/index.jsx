@@ -5,20 +5,31 @@ import { useAppContext } from '../../../contexts/AppContext'
 import ServerNotification from '../../ui/shared/ServerNotification'
 
 const CookView = () => {
-  const { orders, cancelOrderItem, updateOrderItemStatus, markItemReady } = useAppContext()
+  const { orders, cancelOrderItem, markItemReady, acceptOrderItem } = useAppContext()
 
-  const activeOrders = (orders || []).filter(o => {
-    if (o.status !== 'Active') return false;
-    
-    // Check if all items in the order are ready
-    const allItemsReady = (o.items || []).every(item => item.status === 'Ready');
-    
-    // Only show orders that have items that are NOT all ready
-    return !allItemsReady;
-  })
+  // Get active orders with their items, organized by table
+  const activeOrders = (orders || [])
+    .filter(order => order.status === 'Active')
+    .map(order => ({
+      ...order,
+      items: (order.items || [])
+        .filter(item => item.status !== 'Ready' && item.status !== 'Cancelled')
+        .map(item => ({
+          ...item,
+          orderId: order.id,
+          tableNumber: order.tableNumber,
+          orderCreatedAt: order.createdAt
+        }))
+    }))
+    .filter(order => order.items.length > 0) // Only show orders that have active items
+    .sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0))
 
   const handleMarkReady = (orderId, itemId) => {
     markItemReady(orderId, itemId) // This will trigger server notification
+  }
+
+  const handleAccept = (orderId, itemId) => {
+    acceptOrderItem(orderId, itemId)
   }
 
   return (
@@ -31,10 +42,7 @@ const CookView = () => {
         </Card>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-          {activeOrders
-            .slice()
-            .sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0))
-            .map(order => (
+          {activeOrders.map(order => (
             <Card key={order.id}>
               <div className="flex items-center justify-between mb-4">
                 <div>
@@ -45,13 +53,12 @@ const CookView = () => {
               </div>
 
               <ul className="space-y-3">
-                {(order.items || []).map(item => (
-                  <li key={item.id} className="border rounded-md p-3">
+                {order.items.map(item => (
+                  <li key={`${item.orderId}-${item.id}`} className="border rounded-md p-3">
                     <div className="flex items-start justify-between gap-3">
                       <div>
                         <p className="font-medium">
                           {item.name || `Item ${item.id}`}
-                          {item.quantity ? <span className="ml-2 text-gray-500">x{item.quantity}</span> : null}
                         </p>
                         {item.notes ? (
                           <p className="text-sm text-gray-500 mt-1">Notes: {item.notes}</p>
@@ -59,26 +66,42 @@ const CookView = () => {
                       </div>
 
                       <div className="flex items-center gap-2">
-                        <span className={`text-xs px-2 py-1 rounded ${item.status === 'Ready' ? 'bg-green-100 text-green-700' : item.status === 'Cancelled' ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-700'}`}>
+                        <span className={`text-xs px-2 py-1 rounded ${
+                          item.status === 'Accepted' ? 'bg-blue-100 text-blue-700' : 
+                          item.status === 'Ready' ? 'bg-green-100 text-green-700' : 
+                          item.status === 'Cancelled' ? 'bg-red-100 text-red-700' : 
+                          'bg-gray-100 text-gray-700'
+                        }`}>
                           {item.status || 'Pending'}
                         </span>
                       </div>
                     </div>
 
                     <div className="mt-3 flex items-center gap-2">
+                      {item.status !== 'Accepted' && (
+                        <Button
+                          variant="primary"
+                          className="!py-1 !px-3 text-sm"
+                          onClick={() => handleAccept(item.orderId, item.id)}
+                        >
+                          Accept
+                        </Button>
+                      )}
+                      
                       <Button
                         variant="success"
                         className="!py-1 !px-3 text-sm"
-                        disabled={item.status === 'Ready'}
-                        onClick={() => handleMarkReady(order.id, item.id)}
+                        disabled={item.status === 'Ready' || item.status !== 'Accepted'}
+                        onClick={() => handleMarkReady(item.orderId, item.id)}
                       >
                         Mark Ready
                       </Button>
+                      
                       <Button
                         variant="danger"
                         className="!py-1 !px-3 text-sm"
-                        disabled={item.status === 'Cancelled' || item.status === 'Ready'}
-                        onClick={() => cancelOrderItem(order.id, item.id)}
+                        disabled={item.status === 'Cancelled' || item.status === 'Ready' || item.status === 'Accepted'}
+                        onClick={() => cancelOrderItem(item.orderId, item.id)}
                       >
                         Cancel
                       </Button>

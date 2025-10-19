@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useCallback, useState } from 'react';
+import PropTypes from 'prop-types';
 import useLocalStorage from '../hooks/useLocalStorage';
 
 const initialMenu = [
@@ -16,6 +17,8 @@ const OrderStatus = {
 
 const OrderItemStatus = {
     Cancelled: 'Cancelled',
+    Accepted: 'Accepted',
+    // Add other statuses as needed
 };
 
 const AppContext = createContext(undefined);
@@ -55,51 +58,55 @@ export const AppProvider = ({ children }) => {
     }, []);
 
     const placeOrder = useCallback((tableNumber, items) => {
+        // Normalize incoming items: expand quantity into individual per-unit items
+        const expandToPerUnitItems = (list) => {
+            const perUnit = [];
+            list.forEach(srcItem => {
+                const quantity = Math.max(1, srcItem.quantity || 1);
+                for (let i = 0; i < quantity; i += 1) {
+                    const preserveIdWhenSingle = quantity === 1 && srcItem.id && typeof srcItem.id !== 'undefined';
+                    perUnit.push({
+                        name: srcItem.name,
+                        price: srcItem.price,
+                        notes: srcItem.notes,
+                        // Preserve existing status if provided (e.g., when editing), otherwise undefined
+                        status: srcItem.status,
+                        // Keep existing id if editing a single item; otherwise assign new unique id
+                        id: preserveIdWhenSingle ? srcItem.id : `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+                    });
+                }
+            });
+            return perUnit;
+        };
+
+        const normalizedItems = expandToPerUnitItems(items);
+
         setOrders(prev => {
-            const itemsWithUniqueIds = items.map(item => ({
-                ...item,
-                id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
-            }));
-            
-            const newOrder = {
-                id: `T${tableNumber}-${Date.now()}`,
-                tableNumber,
-                items: itemsWithUniqueIds,
-                status: OrderStatus.Active,
-                createdAt: Date.now(),
-            };
-            return [...prev, newOrder];
+            const existingOrderIndex = prev.findIndex(o => o.tableNumber === tableNumber && o.status === OrderStatus.Active);
+
+            if (existingOrderIndex > -1) {
+                const updatedOrders = [...prev];
+                const existingOrder = updatedOrders[existingOrderIndex];
+                // Replace items with the newly submitted normalized list (edit behavior)
+                updatedOrders[existingOrderIndex] = {
+                    ...existingOrder,
+                    items: normalizedItems,
+                };
+                return updatedOrders;
+            } else {
+                const newOrder = {
+                    id: `T${tableNumber}-${Date.now()}`,
+                    tableNumber,
+                    items: normalizedItems,
+                    status: OrderStatus.Active,
+                    createdAt: Date.now(),
+                };
+                return [...prev, newOrder];
+            }
         });
 
         addCookNotification(`New order for table ${tableNumber}!`); // Notify cook
     }, [setOrders, addCookNotification]);
-
-    const updateOrder = useCallback((orderId, items) => {
-        setOrders(prev => prev.map(order => {
-            if (order.id === orderId) {
-                const updatedItems = items.map(item => {
-                    const existingItem = order.items.find(existingItem => 
-                        existingItem.menuItemId === item.menuItemId && 
-                        existingItem.notes === item.notes
-                    );
-                    
-                    return {
-                        ...item,
-                        id: existingItem ? existingItem.id : `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
-                    };
-                });
-                
-                return {
-                    ...order,
-                    items: updatedItems
-                };
-            }
-            return order;
-        }));
-    }, [setOrders]);
-
-
-    
 
     const updateOrderItemStatus = useCallback((orderId, orderItemId, status) => {
         setOrders(prev => prev.map(order => {
@@ -114,6 +121,13 @@ export const AppProvider = ({ children }) => {
             return order;
         }));
     }, [setOrders]);
+
+
+    
+
+    const acceptOrderItem = useCallback((orderId, orderItemId) => {
+        updateOrderItemStatus(orderId, orderItemId, OrderItemStatus.Accepted);
+    }, [updateOrderItemStatus]);
 
     const markItemReady = useCallback((orderId, orderItemId) => {
         updateOrderItemStatus(orderId, orderItemId, 'Ready');
@@ -140,7 +154,6 @@ export const AppProvider = ({ children }) => {
         updateMenuItem,
         deleteMenuItem,
         placeOrder,
-        updateOrder,
         cancelOrderItem,
         updateOrderItemStatus,
         deliverBill,
@@ -149,6 +162,7 @@ export const AppProvider = ({ children }) => {
         addCookNotification,
         addServerNotification,
         markItemReady,
+        acceptOrderItem,
     };
 
     return (
@@ -156,6 +170,10 @@ export const AppProvider = ({ children }) => {
             {children}
         </AppContext.Provider>
     );
+};
+
+AppProvider.propTypes = {
+    children: PropTypes.node,
 };
 
 export const useAppContext = () => {

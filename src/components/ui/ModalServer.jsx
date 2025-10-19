@@ -6,6 +6,8 @@
  * Created by Phyo, 10 October 2025
  */
 
+import React from 'react'
+import PropTypes from 'prop-types'
 import Button from './Button'
 import Card from './Card'
 
@@ -99,9 +101,16 @@ const ModalServer = ({
                   const totalPrice = item.price * item.quantity
                   
                   return (
-                    <Card key={item.id} className="p-3 bg-gray-50">
+                    <Card key={item.id} className={`p-3 ${item.status === 'Accepted' ? 'bg-blue-50 border-blue-200' : 'bg-gray-50'}`}>
                       <div className="flex items-center justify-between mb-2">
-                        <h4 className="font-semibold text-gray-800">{item.name}</h4>
+                        <div className="flex items-center gap-2">
+                          <h4 className="font-semibold text-gray-800">{item.name}</h4>
+                          {item.status === 'Accepted' && (
+                            <span className="text-xs px-2 py-1 rounded bg-blue-100 text-blue-700 font-medium">
+                              Accepted
+                            </span>
+                          )}
+                        </div>
                         <span className="text-lg font-bold text-green-600">
                           ${totalPrice.toFixed(2)}
                         </span>
@@ -114,6 +123,7 @@ const ModalServer = ({
                           <Button
                             variant="secondary"
                             onClick={() => onUpdateQuantity(item.id, item.quantity - 1)}
+                            disabled={item.status === 'Accepted' || item.status === 'Ready' || item.status === 'Cancelled'}
                             className="w-7 h-7 rounded-full text-sm p-0"
                           >
                             -
@@ -124,6 +134,7 @@ const ModalServer = ({
                           <Button
                             variant="secondary"
                             onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
+                            disabled={item.status === 'Accepted' || item.status === 'Ready' || item.status === 'Cancelled'}
                             className="w-7 h-7 rounded-full text-sm p-0"
                           >
                             +
@@ -131,9 +142,10 @@ const ModalServer = ({
                           <Button
                             variant="danger"
                             onClick={() => onRemoveItem(item.id)}
+                            disabled={item.status === 'Accepted' || item.status === 'Ready' || item.status === 'Cancelled'}
                             className="text-xs px-2 py-1 ml-2"
                           >
-                            Remove
+                            {item.status === 'Accepted' ? 'Accepted' : 'Remove'}
                           </Button>
                         </div>
                       </div>
@@ -173,4 +185,25 @@ const ModalServer = ({
 }
 
 export default ModalServer
+
+ModalServer.propTypes = {
+  isOpen: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
+  tableNumber: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
+  menuItems: PropTypes.arrayOf(PropTypes.shape({
+    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+    name: PropTypes.string.isRequired,
+    price: PropTypes.number.isRequired,
+  })).isRequired,
+  orderItems: PropTypes.arrayOf(PropTypes.shape({
+    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+    name: PropTypes.string.isRequired,
+    price: PropTypes.number.isRequired,
+    quantity: PropTypes.number.isRequired,
+  })).isRequired,
+  onAddItem: PropTypes.func.isRequired,
+  onUpdateQuantity: PropTypes.func.isRequired,
+  onRemoveItem: PropTypes.func.isRequired,
+  onSubmitOrder: PropTypes.func.isRequired,
+}
 
