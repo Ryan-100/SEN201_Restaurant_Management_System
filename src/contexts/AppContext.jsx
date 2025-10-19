@@ -39,6 +39,10 @@ export const AppProvider = ({ children }) => {
         setMenu(prev => prev.filter(item => item.id !== itemId));
     }, [setMenu]);
 
+    const setAllMenuItems = useCallback((items) => {
+        setMenu(items);
+    }, [setMenu]);
+
     const addCookNotification = useCallback((message) => {
         const id = Date.now().toString();
         setCookNotifications(prev => [...prev, {id, message}]);
@@ -224,6 +228,7 @@ export const AppProvider = ({ children }) => {
         addMenuItem,
         updateMenuItem,
         deleteMenuItem,
+        setAllMenuItems,
         placeOrder,
         updateOrder,
         cancelOrderItem,
