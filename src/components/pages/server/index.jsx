@@ -28,6 +28,7 @@ const ServerView = () => {
   const [isOrderModalOpen, setIsOrderModalOpen] = useState(false)
   const [currentOrderItems, setCurrentOrderItems] = useState([])
   const [currentOrderId, setCurrentOrderId] = useState(null)
+  const [expandedTables, setExpandedTables] = useState(new Set())
   
   const TOTAL_TABLES = 12
 
@@ -56,6 +57,29 @@ const ServerView = () => {
     })
     return items
   }, [activeOrders])
+
+  const readyItemsByTable = useMemo(() => {
+    const grouped = {}
+    readyItems.forEach(item => {
+      if (!grouped[item.tableNumber]) {
+        grouped[item.tableNumber] = []
+      }
+      grouped[item.tableNumber].push(item)
+    })
+    return grouped
+  }, [readyItems])
+
+  const toggleTableExpanded = (tableNumber) => {
+    setExpandedTables(prev => {
+      const newSet = new Set(prev)
+      if (newSet.has(tableNumber)) {
+        newSet.delete(tableNumber)
+      } else {
+        newSet.add(tableNumber)
+      }
+      return newSet
+    })
+  }
 
   const handleTableSelect = (tableNumber) => {
     setSelectedTable(tableNumber)
@@ -266,25 +290,45 @@ const ServerView = () => {
               {readyItems.length === 0 ? (
                 <p className="text-gray-500 text-center py-8">No items are ready.</p>
               ) : (
-                <div className="space-y-3 max-h-[calc(100vh-200px)] overflow-y-auto">
-                  {readyItems.map(item => (
-                    <div 
-                      key={`${item.orderId}-${item.id}`}
-                      className="bg-yellow-50 border-l-4 border-yellow-500 p-3 rounded-lg"
-                    >
-                      <div className="flex justify-between items-start gap-3">
-                        <div className="flex-1">
-                          <div className="font-semibold text-gray-800">{item.name}</div>
-                          <div className="text-sm text-gray-600">For Table {item.tableNumber}</div>
+                <div className="space-y-2 max-h-[calc(100vh-200px)] overflow-y-auto">
+                  {Object.entries(readyItemsByTable).map(([tableNum, items]) => (
+                    <div key={tableNum} className="border rounded-lg">
+                      <button
+                        onClick={() => toggleTableExpanded(parseInt(tableNum))}
+                        className="w-full flex justify-between items-center p-3 hover:bg-gray-100 transition"
+                      >
+                        <div className="font-semibold text-gray-800">
+                          Table {tableNum} ({items.length} item{items.length !== 1 ? 's' : ''})
                         </div>
-                        <Button 
-                          variant="success"
-                          onClick={() => handleServeItem(item.orderId, item.id)}
-                          className="text-sm px-3 py-1 whitespace-nowrap"
-                        >
-                          Serve
-                        </Button>
-                      </div>
+                        <span className="text-gray-600">
+                          {expandedTables.has(parseInt(tableNum)) ? '▼' : '▶'}
+                        </span>
+                      </button>
+                      
+                      {expandedTables.has(parseInt(tableNum)) && (
+                        <div className="bg-gray-50 border-t space-y-2 p-2">
+                          {items.map(item => (
+                            <div 
+                              key={`${item.orderId}-${item.id}`}
+                              className="bg-yellow-50 border-l-4 border-yellow-500 p-3 rounded-lg flex justify-between items-start gap-3"
+                            >
+                              <div className="flex-1">
+                                <div className="font-semibold text-gray-800">{item.name}</div>
+                                {item.notes && (
+                                  <div className="text-sm text-gray-600">Note: {item.notes}</div>
+                                )}
+                              </div>
+                              <Button 
+                                variant="success"
+                                onClick={() => handleServeItem(item.orderId, item.id)}
+                                className="text-sm px-3 py-1 whitespace-nowrap"
+                              >
+                                Serve
+                              </Button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
