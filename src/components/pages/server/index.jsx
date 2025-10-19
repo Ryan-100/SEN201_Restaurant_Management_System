@@ -142,7 +142,13 @@ const ServerView = () => {
   }
 
   const handleSubmitOrder = () => {
-    if (currentOrderItems.length > 0 && selectedTable) {
+    if (selectedTable) {
+      // For new orders, require at least one item
+      // For existing orders, allow update even with zero items (to remove all items)
+      if (!currentOrderId && currentOrderItems.length === 0) {
+        return; // Can't place new order with no items
+      }
+      
       if (currentOrderId) {
         updateOrder(currentOrderId, currentOrderItems)
       } else {
@@ -290,46 +296,63 @@ const ServerView = () => {
               {readyItems.length === 0 ? (
                 <p className="text-gray-500 text-center py-8">No items are ready.</p>
               ) : (
-                <div className="space-y-2 max-h-[calc(100vh-200px)] overflow-y-auto">
+                <div className="space-y-3 max-h-[calc(100vh-200px)] overflow-y-auto">
                   {Object.entries(readyItemsByTable).map(([tableNum, items]) => (
-                    <div key={tableNum} className="border rounded-lg">
+                    <Card key={tableNum} className="p-0 overflow-hidden border-l-4 border-yellow-500">
                       <button
                         onClick={() => toggleTableExpanded(parseInt(tableNum))}
-                        className="w-full flex justify-between items-center p-3 hover:bg-gray-100 transition"
+                        className="w-full flex justify-between items-center p-4 hover:bg-yellow-50 transition bg-yellow-100 bg-opacity-30"
                       >
-                        <div className="font-semibold text-gray-800">
-                          Table {tableNum} ({items.length} item{items.length !== 1 ? 's' : ''})
+                        <div>
+                          <div className="font-semibold text-gray-800">
+                            Table {tableNum}
+                          </div>
+                          <div className="text-sm text-gray-600">
+                            {items.length} item{items.length !== 1 ? 's' : ''} ready
+                          </div>
                         </div>
-                        <span className="text-gray-600">
+                        <span className="text-gray-600 text-lg">
                           {expandedTables.has(parseInt(tableNum)) ? '▼' : '▶'}
                         </span>
                       </button>
                       
                       {expandedTables.has(parseInt(tableNum)) && (
-                        <div className="bg-gray-50 border-t space-y-2 p-2">
+                        <div className="border-t border-gray-200 p-3 space-y-2 bg-white">
                           {items.map(item => (
                             <div 
                               key={`${item.orderId}-${item.id}`}
-                              className="bg-yellow-50 border-l-4 border-yellow-500 p-3 rounded-lg flex justify-between items-start gap-3"
+                              className="flex justify-between items-start gap-3 p-2 bg-gray-50 rounded hover:bg-gray-100 transition"
                             >
                               <div className="flex-1">
-                                <div className="font-semibold text-gray-800">{item.name}</div>
+                                <div className="font-medium text-gray-800">{item.name}</div>
                                 {item.notes && (
-                                  <div className="text-sm text-gray-600">Note: {item.notes}</div>
+                                  <div className="text-xs text-gray-500 mt-1">Note: {item.notes}</div>
                                 )}
                               </div>
                               <Button 
                                 variant="success"
                                 onClick={() => handleServeItem(item.orderId, item.id)}
-                                className="text-sm px-3 py-1 whitespace-nowrap"
+                                className="text-xs px-2 py-1 whitespace-nowrap"
                               >
                                 Serve
                               </Button>
                             </div>
                           ))}
+                          
+                          <div className="border-t border-gray-200 pt-2 mt-2">
+                            <Button 
+                              variant="success"
+                              onClick={() => {
+                                items.forEach(item => handleServeItem(item.orderId, item.id))
+                              }}
+                              className="w-full text-sm py-2"
+                            >
+                              Serve All
+                            </Button>
+                          </div>
                         </div>
                       )}
-                    </div>
+                    </Card>
                   ))}
                 </div>
               )}

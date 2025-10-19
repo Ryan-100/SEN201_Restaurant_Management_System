@@ -19,6 +19,8 @@ const OrderItemStatus = {
 
 const AppContext = createContext(undefined);
 
+let globalIdCounter = 0;
+
 export const AppProvider = ({ children }) => {
     const [menu, setMenu] = useLocalStorage('restaurant-menu', initialMenu);
     const [orders, setOrders] = useLocalStorage('restaurant-orders', []);
@@ -58,30 +60,20 @@ export const AppProvider = ({ children }) => {
         const expandToPerUnitItems = (list) => {
             const perUnit = [];
             list.forEach(srcItem => {
-                // Skip if item is already expanded
-                if (srcItem.alreadyExpanded) {
-                    perUnit.push({
-                        name: srcItem.name,
-                        price: srcItem.price,
-                        notes: srcItem.notes,
-                        status: srcItem.status,
-                        id: srcItem.id,
-                        // Remove the expansion flag
-                    });
-                    return;
-                }
+                // Always generate new unique IDs, even if already expanded
+                const quantity = srcItem.alreadyExpanded ? 1 : (Math.max(1, srcItem.quantity || 1));
                 
-                const quantity = Math.max(1, srcItem.quantity || 1);
                 for (let i = 0; i < quantity; i += 1) {
-                    const preserveIdWhenSingle = quantity === 1 && srcItem.id && typeof srcItem.id !== 'undefined';
+                    // Always generate new unique ID using global counter
+                    globalIdCounter += 1;
                     perUnit.push({
                         name: srcItem.name,
                         price: srcItem.price,
                         notes: srcItem.notes,
                         // Preserve existing status if provided (e.g., when editing), otherwise undefined
                         status: srcItem.status,
-                        // Keep existing id if editing a single item; otherwise assign new unique id
-                        id: preserveIdWhenSingle ? srcItem.id : `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+                        // Use global counter for absolute uniqueness
+                        id: `${Date.now()}-${globalIdCounter}`,
                     });
                 }
             });
@@ -144,17 +136,41 @@ export const AppProvider = ({ children }) => {
                     item.status === 'Served'
                 );
 
-                // Clean server items (remove internal flags)
-                const cleanedServerItems = itemsFromServer.map(item => {
-                    const { alreadyExpanded, ...rest } = item;
-                    return rest;
-                });
+                // Process server items: expand those with quantity property
+                const processedServerItems = [];
+                for (const item of itemsFromServer) {
+                    const { alreadyExpanded, ...itemWithoutFlag } = item;
+                    
+                    if (alreadyExpanded && item.quantity && item.quantity > 1) {
+                        // If marked as already expanded but has quantity > 1, expand it into multiple items
+                        for (let i = 0; i < item.quantity; i += 1) {
+                            globalIdCounter += 1;
+                            processedServerItems.push({
+                                ...itemWithoutFlag,
+                                id: `${Date.now()}-${globalIdCounter}`,
+                                quantity: undefined, // Remove quantity for expanded items
+                            });
+                        }
+                    } else if (alreadyExpanded) {
+                        // Item is already expanded (quantity 1 or single item)
+                        // Generate new unique ID to prevent duplicates, remove quantity
+                        globalIdCounter += 1;
+                        const { quantity, ...itemNoQuantity } = itemWithoutFlag;
+                        processedServerItems.push({
+                            ...itemNoQuantity,
+                            id: `${Date.now()}-${globalIdCounter}`, // Always generate new ID
+                        });
+                    } else {
+                        // Item is not marked as expanded, use as-is
+                        processedServerItems.push(itemWithoutFlag);
+                    }
+                }
 
                 // Combine protected items with ALL server items
                 // Server items are the complete order state we want to keep
                 return {
                     ...order,
-                    items: [...protectedItems, ...cleanedServerItems]
+                    items: [...protectedItems, ...processedServerItems]
                 };
             }
             return order;

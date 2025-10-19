@@ -173,9 +173,9 @@ const ModalServer = ({
               variant="primary" 
               onClick={onSubmitOrder}
               className="px-6 py-2"
-              disabled={orderItems.length === 0}
+              disabled={orderItems.length === 0 && !isEditing}
             >
-              {orderItems.length === 0 ? 'Add Items' : (isEditing ? 'Update Order' : 'Submit Order')}
+              {isEditing ? 'Update Order' : (orderItems.length === 0 ? 'Add Items' : 'Submit Order')}
             </Button>
           </div>
         </div>
