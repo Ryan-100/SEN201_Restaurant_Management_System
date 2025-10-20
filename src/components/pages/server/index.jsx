@@ -13,12 +13,22 @@ import Button from '../../ui/Button'
 import Card from '../../ui/Card'
 import ModalServer from '../../ui/ModalServer'
 
+/**
+ * Server dashboard for managing restaurant tables and orders
+ *
+ * Props: None
+ *
+ * Returns: JSX element containing server interface with table management,
+ * order taking modal, active bills, and ready-for-pickup section
+ */
 const ServerView = () => {
-  const { menu, orders, placeOrder, deliverBill, updateOrderItemStatus } = useAppContext()
+  const { menu, orders, placeOrder, updateOrder, deliverBill, updateOrderItemStatus } = useAppContext()
   
   const [selectedTable, setSelectedTable] = useState(null)
   const [isOrderModalOpen, setIsOrderModalOpen] = useState(false)
   const [currentOrderItems, setCurrentOrderItems] = useState([])
+  const [currentOrderId, setCurrentOrderId] = useState(null)
+  const [expandedTables, setExpandedTables] = useState(new Set())
   
   const TOTAL_TABLES = 12
 
@@ -48,16 +58,49 @@ const ServerView = () => {
     return items
   }, [activeOrders])
 
+  const readyItemsByTable = useMemo(() => {
+    const grouped = {}
+    readyItems.forEach(item => {
+      if (!grouped[item.tableNumber]) {
+        grouped[item.tableNumber] = []
+      }
+      grouped[item.tableNumber].push(item)
+    })
+    return grouped
+  }, [readyItems])
+
+  const toggleTableExpanded = (tableNumber) => {
+    setExpandedTables(prev => {
+      const newSet = new Set(prev)
+      if (newSet.has(tableNumber)) {
+        newSet.delete(tableNumber)
+      } else {
+        newSet.add(tableNumber)
+      }
+      return newSet
+    })
+  }
+
   const handleTableSelect = (tableNumber) => {
     setSelectedTable(tableNumber)
     const existingOrder = activeOrders.find(order => order.tableNumber === tableNumber)
     
     if (existingOrder) {
-      setCurrentOrderItems(existingOrder.items.map(item => ({
+      setCurrentOrderId(existingOrder.id)
+      // Only load items that are NOT protected (not Accepted, Ready, or Served)
+      const editableItems = existingOrder.items.filter(item =>
+        item.status !== 'Accepted' &&
+        item.status !== 'Ready' &&
+        item.status !== 'Served'
+      )
+      setCurrentOrderItems(editableItems.map(item => ({
         ...item,
-        quantity: item.quantity || 1
+        quantity: item.quantity || 1,
+        // Mark as already expanded so expandToPerUnitItems won't re-expand
+        alreadyExpanded: true
       })))
     } else {
+      setCurrentOrderId(null)
       setCurrentOrderItems([])
     }
     
@@ -99,8 +142,18 @@ const ServerView = () => {
   }
 
   const handleSubmitOrder = () => {
-    if (currentOrderItems.length > 0 && selectedTable) {
-      placeOrder(selectedTable, currentOrderItems)
+    if (selectedTable) {
+      // For new orders, require at least one item
+      // For existing orders, allow update even with zero items (to remove all items)
+      if (!currentOrderId && currentOrderItems.length === 0) {
+        return; // Can't place new order with no items
+      }
+      
+      if (currentOrderId) {
+        updateOrder(currentOrderId, currentOrderItems)
+      } else {
+        placeOrder(selectedTable, currentOrderItems)
+      }
       handleCloseModal()
     }
   }
@@ -109,6 +162,7 @@ const ServerView = () => {
     setIsOrderModalOpen(false)
     setSelectedTable(null)
     setCurrentOrderItems([])
+    setCurrentOrderId(null)
   }
 
   const handleViewEditOrder = (orderId) => {
@@ -243,25 +297,62 @@ const ServerView = () => {
                 <p className="text-gray-500 text-center py-8">No items are ready.</p>
               ) : (
                 <div className="space-y-3 max-h-[calc(100vh-200px)] overflow-y-auto">
-                  {readyItems.map(item => (
-                    <div 
-                      key={`${item.orderId}-${item.id}`}
-                      className="bg-yellow-50 border-l-4 border-yellow-500 p-3 rounded-lg"
-                    >
-                      <div className="flex justify-between items-start gap-3">
-                        <div className="flex-1">
-                          <div className="font-semibold text-gray-800">{item.name}</div>
-                          <div className="text-sm text-gray-600">For Table {item.tableNumber}</div>
+                  {Object.entries(readyItemsByTable).map(([tableNum, items]) => (
+                    <Card key={tableNum} className="p-0 overflow-hidden border-l-4 border-yellow-500">
+                      <button
+                        onClick={() => toggleTableExpanded(parseInt(tableNum))}
+                        className="w-full flex justify-between items-center p-4 hover:bg-yellow-50 transition bg-yellow-100 bg-opacity-30"
+                      >
+                        <div>
+                          <div className="font-semibold text-gray-800">
+                            Table {tableNum}
+                          </div>
+                          <div className="text-sm text-gray-600">
+                            {items.length} item{items.length !== 1 ? 's' : ''} ready
+                          </div>
                         </div>
-                        <Button 
-                          variant="success"
-                          onClick={() => handleServeItem(item.orderId, item.id)}
-                          className="text-sm px-3 py-1 whitespace-nowrap"
-                        >
-                          Serve
-                        </Button>
-                      </div>
-                    </div>
+                        <span className="text-gray-600 text-lg">
+                          {expandedTables.has(parseInt(tableNum)) ? '▼' : '▶'}
+                        </span>
+                      </button>
+                      
+                      {expandedTables.has(parseInt(tableNum)) && (
+                        <div className="border-t border-gray-200 p-3 space-y-2 bg-white">
+                          {items.map(item => (
+                            <div 
+                              key={`${item.orderId}-${item.id}`}
+                              className="flex justify-between items-start gap-3 p-2 bg-gray-50 rounded hover:bg-gray-100 transition"
+                            >
+                              <div className="flex-1">
+                                <div className="font-medium text-gray-800">{item.name}</div>
+                                {item.notes && (
+                                  <div className="text-xs text-gray-500 mt-1">Note: {item.notes}</div>
+                                )}
+                              </div>
+                              <Button 
+                                variant="success"
+                                onClick={() => handleServeItem(item.orderId, item.id)}
+                                className="text-xs px-2 py-1 whitespace-nowrap"
+                              >
+                                Serve
+                              </Button>
+                            </div>
+                          ))}
+                          
+                          <div className="border-t border-gray-200 pt-2 mt-2">
+                            <Button 
+                              variant="success"
+                              onClick={() => {
+                                items.forEach(item => handleServeItem(item.orderId, item.id))
+                              }}
+                              className="w-full text-sm py-2"
+                            >
+                              Serve All
+                            </Button>
+                          </div>
+                        </div>
+                      )}
+                    </Card>
                   ))}
                 </div>
               )}
@@ -280,6 +371,7 @@ const ServerView = () => {
         onUpdateQuantity={handleUpdateQuantity}
         onRemoveItem={handleRemoveItem}
         onSubmitOrder={handleSubmitOrder}
+        isEditing={currentOrderId !== null}
       />
     </div>
   )
