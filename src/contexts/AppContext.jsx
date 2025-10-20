@@ -1,5 +1,15 @@
+/*
+ * AppContext.jsx
+ *
+ * Global application context providing state management for menu items, orders,
+ * and notifications across the restaurant management system.
+ *
+ * Created by Ryan, 29 September 2025
+ */
+
 import React, { createContext, useContext, useCallback, useState } from 'react';
 import PropTypes from 'prop-types';
+
 import useLocalStorage from '../hooks/useLocalStorage';
 import { menuItems as managerMenuItems } from '../data/menuItems';
 
@@ -21,6 +31,14 @@ const AppContext = createContext(undefined);
 
 let globalIdCounter = 0;
 
+/*
+ * Application context provider component
+ *
+ * Props:
+ * children - React node, child components to be wrapped by the context
+ *
+ * Returns: JSX element providing context to child components
+ */
 export const AppProvider = ({ children }) => {
     const [menu, setMenu] = useLocalStorage('restaurant-menu', initialMenu);
     const [orders, setOrders] = useLocalStorage('restaurant-orders', []);
@@ -253,10 +271,15 @@ AppProvider.propTypes = {
     children: PropTypes.node,
 };
 
+/*
+ * Custom hook to access the application context
+ *
+ * Returns: object, context value containing all state and functions
+ */
 export const useAppContext = () => {
-    const context = useContext(AppContext);
-    if (!context) {
-        throw new Error('useAppContext must be used within an AppProvider');
-    }
-    return context;
+  const context = useContext(AppContext);
+  if (!context) {
+    throw new Error('useAppContext must be used within an AppProvider');
+  }
+  return context;
 };
