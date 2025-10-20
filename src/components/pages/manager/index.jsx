@@ -1,17 +1,16 @@
 /*
  * index.jsx
  *
- * The main view component for the Manager role. It serves as the container
- * for all manager-specific functionalities, such as menu and report management.
+ * The main view component for the Manager role. 
  *
  * Created by Grace (Shinn Thant Khin), 07 October 2025
  */
-import React, {useState} from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useAppContext } from '../../../contexts/AppContext';
 import ModalManager from '../../ui/ModalManager';
 import MenuForm from '../../ui/MenuForm';
 
-// calculate the total for a single order's item
+// calculate the total for a single order's items
 const calculateOrderTotal = (items) => {
   if (!Array.isArray(items)) {
     return 0;
@@ -19,13 +18,22 @@ const calculateOrderTotal = (items) => {
   return items.reduce((total, item) => total + item.price * (item.quantity || 1), 0);
 };
 
-// main dashboard of the Manager
+// get today's date in YYYY-MM-DD format
+const getTodayDateString = () => {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, '0');
+  const day = String(today.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
+// Main dashboard for the Manager, containing all features.
 const ManagerView = () => {
-  const {menu, orders, addMenuItem, updateMenuItem, deleteMenuItem} = useAppContext();
+  const { menu, orders, addMenuItem, updateMenuItem, deleteMenuItem } = useAppContext();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
-  const [startDate, setStartDate] = useState('');
-  const [endDate, setEndDate] = useState('');
+  const [startDate, setStartDate] = useState(getTodayDateString());
+  const [endDate, setEndDate] = useState(getTodayDateString());
   const [reportData, setReportData] = useState(null);
   const [summary, setSummary] = useState(null);
 
@@ -44,7 +52,7 @@ const ManagerView = () => {
   const handleFormSubmit = (formData) => {
     const isUpdating = selectedItem !== null;
     if (isUpdating) {
-      updateMenuItem({...selectedItem, ...formData});
+      updateMenuItem({ id: selectedItem.id, ...formData });
     } else {
       addMenuItem(formData);
     }
@@ -57,9 +65,8 @@ const ManagerView = () => {
     }
   };
 
-  const handleGenerateReport = () => {
+  const handleGenerateReport = useCallback(() => {
     if (!startDate || !endDate) {
-      alert('Please select both a start and end date.');
       return;
     }
     const start = new Date(startDate);
@@ -67,7 +74,7 @@ const ManagerView = () => {
     const end = new Date(endDate);
     end.setHours(23, 59, 59, 999);
 
-    const filteredOrders = orders.filter(order => 
+    const filteredOrders = orders.filter(order =>
       order.status === 'Paid' &&
       order.paidAt &&
       order.paidAt >= start.getTime() &&
@@ -76,13 +83,16 @@ const ManagerView = () => {
 
     const totalRevenue = filteredOrders.reduce((total, order) => total + calculateOrderTotal(order.items), 0);
     const totalOrders = filteredOrders.length;
-    setSummary({totalRevenue, totalOrders});
+    setSummary({ totalRevenue, totalOrders });
     setReportData(filteredOrders);
-  };
+  }, [startDate, endDate, orders]);
+
+  useEffect(() => {
+    handleGenerateReport();
+  }, [handleGenerateReport]);
 
   return (
     <div className="space-y-6">
-      
       {/* Menu Management Section */}
       <div className="p-4 bg-white rounded-lg shadow-md">
         <div className="flex justify-between items-center mb-4">
