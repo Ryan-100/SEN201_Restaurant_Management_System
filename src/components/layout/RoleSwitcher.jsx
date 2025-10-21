@@ -19,13 +19,12 @@ import { Role } from "../../data/role";
  */
 const RoleSwitcher = () => {
     const location = useLocation();
-    const roles = [Role.Manager, Role.Server, Role.Cook, Role.Test];
+    const roles = [Role.Manager, Role.Server, Role.Cook];
 
     const roleConfig = {
         [Role.Manager]: { bgColor: 'bg-blue-600', hoverBgColor: 'hover:bg-blue-700', icon: 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z', path: '/manager' },
         [Role.Server]: { bgColor: 'bg-green-600', hoverBgColor: 'hover:bg-green-700', icon: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z', path: '/server' },
         [Role.Cook]: { bgColor: 'bg-yellow-600', hoverBgColor: 'hover:bg-yellow-700', icon: 'M13 10V3L4 14h7v7l9-11h-7z', path: '/cook' },
-        [Role.Test]: { bgColor: 'bg-purple-600', hoverBgColor: 'hover:bg-purple-700', icon: 'M14 10V3L4 14h7v7l9-11h-7z', path: '/test' },
     };
 
   return (
