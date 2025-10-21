@@ -2,6 +2,8 @@
   "name": "sen201-restaurant-management-system",
   "private": true,
   "version": "0.0.0",
+  "description": "A comprehensive restaurant management system for orders, menu, and staff management",
+  "author": "BinaryBrains",
   "type": "module",
   "scripts": {
     "dev": "vite",
