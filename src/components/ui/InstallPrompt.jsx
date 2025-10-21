@@ -5,6 +5,7 @@
  * Handles the beforeinstallprompt event and provides user-friendly installation UI.
  *
  * Created by Ryan, 29 September 2025
+ * Updated by Ryan, 20 October 2025
  */
 
 import React, { useState, useEffect } from 'react';
@@ -18,6 +19,7 @@ const InstallPrompt = () => {
   const [deferredPrompt, setDeferredPrompt] = useState(null);
   const [showInstallPrompt, setShowInstallPrompt] = useState(false);
   const [isInstalled, setIsInstalled] = useState(false);
+  const [isDesktopEnv, setIsDesktopEnv] = useState(false);
 
   useEffect(() => {
     // Check if app is already installed
@@ -34,6 +36,17 @@ const InstallPrompt = () => {
       setDeferredPrompt(e);
       setShowInstallPrompt(true);
     };
+
+    // Detect Electron/desktop environment for cross-platform install option
+    try {
+      // Basic detection: preload may expose window.desktop
+      if (typeof window !== 'undefined' && window.desktop) {
+        setIsDesktopEnv(true);
+      }
+      // User agents that block PWA installs (Safari/Firefox) will still see desktop option
+    } catch {
+      // no-op
+    }
 
     // Listen for the appinstalled event
     const handleAppInstalled = () => {
@@ -87,6 +100,12 @@ const InstallPrompt = () => {
     sessionStorage.setItem('pwa-prompt-dismissed', 'true');
   };
 
+  const handleDesktopDownload = () => {
+    // Redirect to latest release artifacts page
+    const releasesUrl = 'https://github.com/Ryan-100/SEN201_Restaurant_Management_System/releases/latest';
+    window.open(releasesUrl, '_blank', 'noopener');
+  };
+
   // Don't show if already installed or dismissed this session
   if (isInstalled || !showInstallPrompt || sessionStorage.getItem('pwa-prompt-dismissed') === 'true') {
     return null;
@@ -116,6 +135,14 @@ const InstallPrompt = () => {
             >
               Install
             </button>
+            {isDesktopEnv && (
+              <button
+                onClick={handleDesktopDownload}
+                className="bg-indigo-500 text-white px-3 py-1.5 rounded-md text-sm font-medium hover:bg-indigo-600 transition-colors"
+              >
+                Download Desktop
+              </button>
+            )}
             <button
               onClick={handleDismiss}
               className="text-gray-500 px-3 py-1.5 rounded-md text-sm font-medium hover:text-gray-700 transition-colors"
