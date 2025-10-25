@@ -34,14 +34,23 @@ jobs:
       - name: Build web assets (Vite)
         run: npm run build
 
-      - name: Build RPM
-        run: npx electron-builder --linux rpm
+      - name: Build RPM (x86_64)
+        run: npx electron-builder --linux rpm --x64
 
-      - name: Upload RPM artifact
+      - name: Build RPM (aarch64)
+        run: npx electron-builder --linux rpm --arm64
+
+      - name: Upload RPM x86_64 artifact
         uses: actions/upload-artifact@v4
         with:
-          name: linux-rpm
-          path: release/*.rpm
+          name: linux-rpm-x86_64
+          path: release/*x86_64.rpm
+
+      - name: Upload RPM aarch64 artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-rpm-aarch64
+          path: release/*.aarch64.rpm
 
   build-windows-exe:
     name: Windows EXE
