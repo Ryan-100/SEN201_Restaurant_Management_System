@@ -45,7 +45,8 @@
   "main": "electron/main.js",
   "build": {
     "appId": "com.binarybrains.restaurantapp",
-    "productName": "Restaurant Management System",
+    "productName": "Restaurant-Management-System",
+    "executableName": "restaurant-app",
     "files": [
       "dist/**/*",
       "electron/**/*"
