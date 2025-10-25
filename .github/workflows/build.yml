@@ -35,7 +35,7 @@ jobs:
         run: npm run build
 
       - name: Build RPM
-        run: npx electron-builder --linux rpm -c.extraMetadata.main=electron/main.js
+        run: npx electron-builder --linux rpm
 
       - name: Upload RPM artifact
         uses: actions/upload-artifact@v4
@@ -66,7 +66,7 @@ jobs:
         run: npm run build
 
       - name: Build EXE (NSIS)
-        run: npx electron-builder --win nsis -c.extraMetadata.main=electron/main.js
+        run: npx electron-builder --win nsis
 
       - name: Upload EXE artifact
         uses: actions/upload-artifact@v4
@@ -97,7 +97,7 @@ jobs:
         run: npm run build
 
       - name: Build DMG
-        run: npx electron-builder --mac dmg -c.extraMetadata.main=electron/main.js
+        run: npx electron-builder --mac dmg
 
       - name: Upload DMG artifact
         uses: actions/upload-artifact@v4
