@@ -36,3 +36,27 @@ npm run dev
 
 # To build the app
 npm run build
+```
+
+## 🚀 Installation (End Users)
+
+- Windows: run the provided `.exe` installer
+- macOS: open `.dmg` and drag the app to Applications
+- openSUSE/SUSE: install the `.rpm` (e.g., `sudo zypper install ./RestaurantApp.rpm`)
+
+No additional software is required.
+
+## 🧑‍💻 For Developers
+
+### Local Development
+```bash
+npm install
+npm run dev           # start Vite dev server
+npm run dev:electron  # start Electron pointing to Vite
+```
+
+### Build Desktop Installers
+```bash
+npm run build:electron
+```
+Artifacts are generated in the `release/` directory.

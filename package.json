@@ -62,7 +62,7 @@
       "target": ["nsis", "zip"]
     },
     "linux": {
-      "target": ["AppImage", "deb", "zip"],
+      "target": ["rpm", "zip"],
       "category": "Utility"
     }
   }

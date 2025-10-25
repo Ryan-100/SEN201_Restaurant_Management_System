@@ -100,11 +100,8 @@ const InstallPrompt = () => {
     sessionStorage.setItem('pwa-prompt-dismissed', 'true');
   };
 
-  const handleDesktopDownload = () => {
-    // Redirect to latest release artifacts page
-    const releasesUrl = 'https://github.com/Ryan-100/SEN201_Restaurant_Management_System/releases/latest';
-    window.open(releasesUrl, '_blank', 'noopener');
-  };
+  // Desktop download is disabled for this submission (no external download links)
+  const handleDesktopDownload = () => {};
 
   // Don't show if already installed or dismissed this session
   if (isInstalled || !showInstallPrompt || sessionStorage.getItem('pwa-prompt-dismissed') === 'true') {
@@ -135,14 +132,7 @@ const InstallPrompt = () => {
             >
               Install
             </button>
-            {isDesktopEnv && (
-              <button
-                onClick={handleDesktopDownload}
-                className="bg-indigo-500 text-white px-3 py-1.5 rounded-md text-sm font-medium hover:bg-indigo-600 transition-colors"
-              >
-                Download Desktop
-              </button>
-            )}
+            {/* Desktop download intentionally hidden for this submission */}
             <button
               onClick={handleDismiss}
               className="text-gray-500 px-3 py-1.5 rounded-md text-sm font-medium hover:text-gray-700 transition-colors"
