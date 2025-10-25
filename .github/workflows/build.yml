@@ -2,6 +2,9 @@ name: Build desktop installers
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - chore/deployment-alignment-suse-rpm
 
 jobs:
   build-linux-rpm:
