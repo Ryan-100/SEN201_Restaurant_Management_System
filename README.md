@@ -15,8 +15,8 @@ A full-stack Restaurant Management Application built with **ReactJS**. The syste
 
 ## 🛠️ Tech Stack  
 - **Frontend**: ReactJS  
-- **Database**: LocalStroage 
-- **Architecture**: REST API, layered services, data models  
+- **Data storage**: localStorage (client-side)  
+- **Architecture**: client-side application with modular components and context  
 
 ---
 
