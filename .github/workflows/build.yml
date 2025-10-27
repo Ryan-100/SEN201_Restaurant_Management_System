@@ -1,66 +1,117 @@
-# .github/workflows/build.yml
-#
-# GitHub Actions workflow for building Electron app across platforms.
-# Automatically builds Windows, macOS, and Linux installers on release.
-#
-# Created by Ryan, 20 September 2025
-
-name: Build Electron App
+name: Build desktop installers
 
 on:
-  push:
-    tags:
-      - 'v*'
   workflow_dispatch:
+  push:
+    branches:
+      - chore/deployment-alignment-suse-rpm
 
 jobs:
-  build:
-    runs-on: ${{ matrix.os }}
-    
-    strategy:
-      matrix:
-        os: [windows-latest, macos-latest, ubuntu-latest]
-        
+  build-linux-rpm:
+    name: Linux RPM
+    runs-on: ubuntu-latest
+    env:
+      CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+      ELECTRON_BUILDER_DISABLE_UPDATER: 'true'
+      CI: 'true'
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v4
-        
-      - name: Setup Node.js
+
+      - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
-          cache: 'npm'
-          
+          node-version: '20'
+
+      - name: Install rpm tool
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y rpm fakeroot
+
       - name: Install dependencies
         run: npm ci
-        
-      - name: Build app
-        run: npm run build:electron
-        env:
-          GH_TOKEN: ""
-        
-      - name: Upload artifacts
+
+      - name: Build web assets (Vite)
+        run: npm run build
+
+      - name: Build RPM (x86_64)
+        run: npx electron-builder --linux rpm --x64
+
+      - name: Build RPM (aarch64)
+        run: npx electron-builder --linux rpm --arm64
+
+      - name: Upload RPM x86_64 artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.os }}-build
-          path: release/
-          
-  release:
-    needs: build
-    runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/')
-    
-    steps:
-      - name: Download all artifacts
-        uses: actions/download-artifact@v4
-        
-      - name: Create Release
-        uses: softprops/action-gh-release@v1
+          name: linux-rpm-x86_64
+          path: release/*x86_64.rpm
+
+      - name: Upload RPM aarch64 artifact
+        uses: actions/upload-artifact@v4
         with:
-          files: |
-            windows-latest-build/*
-            macos-latest-build/*
-            ubuntu-latest-build/*
-          generate_release_notes: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          name: linux-rpm-aarch64
+          path: release/*.aarch64.rpm
+
+  build-windows-exe:
+    name: Windows EXE
+    runs-on: windows-latest
+    env:
+      CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+      ELECTRON_BUILDER_DISABLE_UPDATER: 'true'
+      CI: 'true'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build web assets (Vite)
+        run: npm run build
+
+      - name: Build EXE (NSIS)
+        run: npx electron-builder --win nsis
+
+      - name: Upload EXE artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-exe
+          path: release/*.exe
+
+  build-macos-dmg:
+    name: macOS DMG
+    runs-on: macos-latest
+    env:
+      CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+      ELECTRON_BUILDER_DISABLE_UPDATER: 'true'
+      CI: 'true'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build web assets (Vite)
+        run: npm run build
+
+      - name: Build DMG
+        run: npx electron-builder --mac dmg
+
+      - name: Upload DMG artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: mac-dmg
+          path: release/*.dmg
+
+  

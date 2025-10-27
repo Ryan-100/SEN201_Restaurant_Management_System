@@ -10,14 +10,15 @@
 import React from 'react';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import { BrowserRouter } from 'react-router-dom';
+import { BrowserRouter, HashRouter } from 'react-router-dom';
 
 import './index.css';
 import App from './App.jsx';
 import { AppProvider } from './contexts/AppContext.jsx';
 
-// Register service worker for PWA functionality
-if ('serviceWorker' in navigator) {
+// Disable SW in Electron (file:// origins) to avoid scope errors
+const isElectron = typeof window !== 'undefined' && !!window.desktop;
+if (!isElectron && 'serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js')
       .then((registration) => {
@@ -29,12 +30,14 @@ if ('serviceWorker' in navigator) {
   });
 }
 
+const Router = isElectron ? HashRouter : BrowserRouter;
+
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <BrowserRouter>
+    <Router>
       <AppProvider>
         <App />
       </AppProvider>
-    </BrowserRouter>
+    </Router>
   </StrictMode>,
 );
