@@ -1,3 +1,12 @@
+/**
+ * ServerNotification.jsx
+ *
+ * Component used by service staff (waiters) to receive and display notifications for order updates coming from the kitchen.
+ * Plays an alert sound when a new notification arrives.
+ *
+ * Created by Ko Sett, 15 October 2025
+ */
+
 import React, { useEffect, useRef } from "react";
 import { useAppContext } from '../../../contexts/AppContext';
 

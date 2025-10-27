@@ -12,6 +12,7 @@ import { useAppContext } from '../../../contexts/AppContext'
 import Button from '../../ui/Button'
 import Card from '../../ui/Card'
 import ModalServer from '../../ui/ModalServer'
+import ServerNotification from '../../ui/shared/ServerNotification'
 
 /**
  * Server dashboard for managing restaurant tables and orders
@@ -373,6 +374,7 @@ const ServerView = () => {
         onSubmitOrder={handleSubmitOrder}
         isEditing={currentOrderId !== null}
       />
+      <ServerNotification />
     </div>
   )
 }
