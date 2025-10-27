@@ -11,6 +11,23 @@ import PropTypes from 'prop-types'
 import Button from './Button'
 import Card from './Card'
 
+/**
+ * Modal for taking and managing table orders
+ *
+ * Props:
+ * isOpen - boolean, controls modal visibility
+ * onClose - function, callback to close modal
+ * tableNumber - number, table number for the order
+ * menuItems - array, list of available menu items
+ * orderItems - array, current items in the order
+ * onAddItem - function, callback to add item to order
+ * onUpdateQuantity - function, callback to update item quantity
+ * onRemoveItem - function, callback to remove item from order
+ * onSubmitOrder - function, callback to submit the order
+ * isEditing - boolean, indicates if editing existing order
+ *
+ * Returns: JSX modal element for order management
+ */
 const ModalServer = ({
   isOpen,
   onClose,
@@ -20,14 +37,17 @@ const ModalServer = ({
   onAddItem,
   onUpdateQuantity,
   onRemoveItem,
-  onSubmitOrder
+  onSubmitOrder,
+  isEditing = false
 }) => {
   if (!isOpen) return null
 
   const calculateTotal = () => {
-    return orderItems.reduce((total, item) => 
-      total + (item.price * item.quantity), 0
-    )
+    return orderItems.reduce((total, item) => {
+      const price = Number(item.price) || 0
+      const quantity = Number(item.quantity) || 0
+      return total + (price * quantity)
+    }, 0)
   }
 
   return (
@@ -153,9 +173,9 @@ const ModalServer = ({
               variant="primary" 
               onClick={onSubmitOrder}
               className="px-6 py-2"
-              disabled={orderItems.length === 0}
+              disabled={orderItems.length === 0 && !isEditing}
             >
-              {orderItems.length === 0 ? 'Add Items' : 'Submit Order'}
+              {isEditing ? 'Update Order' : (orderItems.length === 0 ? 'Add Items' : 'Submit Order')}
             </Button>
           </div>
         </div>

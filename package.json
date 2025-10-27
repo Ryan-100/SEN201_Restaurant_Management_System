@@ -2,12 +2,20 @@
   "name": "sen201-restaurant-management-system",
   "private": true,
   "version": "0.0.0",
+  "description": "A comprehensive restaurant management system for orders, menu, and staff management built by Aung Sett Paing (Ko Sett), Phyo Theingi (Phyo), Shinn Thant Khin (Grace), Kyaw Zin Htet (Ryan)",
+  "author": {
+    "name": "BinaryBrains",
+    "email": "khtet@cmkl.ac.th"
+  },
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:electron": "cross-env ELECTRON_START_URL=http://localhost:5173 electron .",
     "build": "vite build",
+    "build:electron": "vite build && electron-builder -c.extraMetadata.main=electron/main.js",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "start": "electron ."
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.14",
@@ -28,7 +36,34 @@
     "eslint-plugin-react-refresh": "^0.4.20",
     "globals": "^16.4.0",
     "vite": "^7.1.7",
+    "electron": "^31.7.4",
+    "electron-builder": "^25.1.8",
+    "cross-env": "^7.0.3",
     "vite-plugin-pwa": "^1.1.0",
     "workbox-window": "^7.3.0"
+  },
+  "main": "electron/main.js",
+  "build": {
+    "appId": "com.binarybrains.restaurantapp",
+    "productName": "Restaurant Management System",
+    "files": [
+      "dist/**/*",
+      "electron/**/*"
+    ],
+    "directories": {
+      "output": "release"
+    },
+    "publish": null,
+    "mac": {
+      "target": ["dmg", "zip"],
+      "category": "public.app-category.productivity"
+    },
+    "win": {
+      "target": ["nsis", "zip"]
+    },
+    "linux": {
+      "target": ["AppImage", "deb", "zip"],
+      "category": "Utility"
+    }
   }
 }

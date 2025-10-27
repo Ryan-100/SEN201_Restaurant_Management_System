@@ -15,7 +15,6 @@ import RoleSwitcher from './components/layout/RoleSwitcher';
 import ServerView from './components/pages/server';
 import ManagerView from './components/pages/manager';
 import CookView from './components/pages/cook';
-import TestInterface from './components/pages/test';
 import InstallPrompt from './components/ui/InstallPrompt';
 
 import './App.css';
@@ -35,7 +34,6 @@ const App = () => {
           <Route path="/server" element={<ServerView />} />
           <Route path="/manager" element={<ManagerView />} />
           <Route path="/cook" element={<CookView />} />
-          <Route path="/test" element={<TestInterface />} />
         </Routes>
       </main>
       <InstallPrompt />
