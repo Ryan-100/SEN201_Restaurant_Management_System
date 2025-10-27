@@ -6,8 +6,8 @@
  * Created by Phyo, 10 October 2025
  */
 
-import React from 'react'
-import { useState, useMemo } from 'react'
+import React, { useState, useMemo } from 'react'
+
 import { useAppContext } from '../../../contexts/AppContext'
 import Button from '../../ui/Button'
 import Card from '../../ui/Card'
@@ -31,6 +31,11 @@ const ServerView = () => {
   const [expandedTables, setExpandedTables] = useState(new Set())
   
   const TOTAL_TABLES = 12
+  const STATUS = {
+    Accepted: 'Accepted',
+    Ready: 'Ready',
+    Served: 'Served',
+  }
 
   const activeOrders = useMemo(() => 
     orders.filter(order => order.status === 'Active'),
@@ -46,7 +51,7 @@ const ServerView = () => {
     const items = []
     activeOrders.forEach(order => {
       order.items.forEach(item => {
-        if (item.status === 'Ready') {
+        if (item.status === STATUS.Ready) {
           items.push({
             ...item,
             tableNumber: order.tableNumber,
@@ -89,9 +94,9 @@ const ServerView = () => {
       setCurrentOrderId(existingOrder.id)
       // Only load items that are NOT protected (not Accepted, Ready, or Served)
       const editableItems = existingOrder.items.filter(item =>
-        item.status !== 'Accepted' &&
-        item.status !== 'Ready' &&
-        item.status !== 'Served'
+        item.status !== STATUS.Accepted &&
+        item.status !== STATUS.Ready &&
+        item.status !== STATUS.Served
       )
       setCurrentOrderItems(editableItems.map(item => ({
         ...item,
@@ -177,11 +182,11 @@ const ServerView = () => {
   }
 
   const handleServeItem = (orderId, itemId) => {
-    updateOrderItemStatus(orderId, itemId, 'Served')
+    updateOrderItemStatus(orderId, itemId, STATUS.Served)
   }
 
   const canDeliverBill = (order) => {
-    return order.items.every(item => item.status === 'Served')
+    return order.items.every(item => item.status === STATUS.Served)
   }
 
   const calculateOrderTotal = (orderItems) => {
@@ -297,10 +302,12 @@ const ServerView = () => {
                 <p className="text-gray-500 text-center py-8">No items are ready.</p>
               ) : (
                 <div className="space-y-3 max-h-[calc(100vh-200px)] overflow-y-auto">
-                  {Object.entries(readyItemsByTable).map(([tableNum, items]) => (
+                  {Object.entries(readyItemsByTable).map(([tableNum, items]) => {
+                    const tableNumInt = parseInt(tableNum, 10)
+                    return (
                     <Card key={tableNum} className="p-0 overflow-hidden border-l-4 border-yellow-500">
                       <button
-                        onClick={() => toggleTableExpanded(parseInt(tableNum))}
+                        onClick={() => toggleTableExpanded(tableNumInt)}
                         className="w-full flex justify-between items-center p-4 hover:bg-yellow-50 transition bg-yellow-100 bg-opacity-30"
                       >
                         <div>
@@ -312,11 +319,11 @@ const ServerView = () => {
                           </div>
                         </div>
                         <span className="text-gray-600 text-lg">
-                          {expandedTables.has(parseInt(tableNum)) ? '▼' : '▶'}
+                          {expandedTables.has(tableNumInt) ? '▼' : '▶'}
                         </span>
                       </button>
                       
-                      {expandedTables.has(parseInt(tableNum)) && (
+                      {expandedTables.has(tableNumInt) && (
                         <div className="border-t border-gray-200 p-3 space-y-2 bg-white">
                           {items.map(item => (
                             <div 
@@ -353,7 +360,7 @@ const ServerView = () => {
                         </div>
                       )}
                     </Card>
-                  ))}
+                  )})}
                 </div>
               )}
             </Card>
