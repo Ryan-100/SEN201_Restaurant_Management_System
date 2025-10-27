@@ -5,7 +5,7 @@
  * Handles the beforeinstallprompt event and provides user-friendly installation UI.
  *
  * Created by Ryan, 29 September 2025
- * Updated by Ryan, 20 October 2025
+ * Updated by Phyo, 25 October 2025
  */
 
 import React, { useState, useEffect } from 'react';
