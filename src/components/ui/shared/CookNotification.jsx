@@ -1,3 +1,12 @@
+/**
+ * CookNotification.jsx
+ *
+ * Component that displays real-time notifications for kitchen staff when new orders or updates are received. 
+ * Plays a sound alert when a new notification arrives.
+ *
+ * Created by Ko Sett, 15 October 2025
+ */
+
 import React, { useEffect, useRef } from "react";
 import { useAppContext } from '../../../contexts/AppContext';
 
@@ -16,7 +25,7 @@ const CookNotification = () => {
     return (
         <>
             <audio ref={audioRef} src="/notification.mp3" preload="auto" />
-            <div className="fixed top-4 right-4 space-y-2 z-50">
+            <div className="fixed bottom-4 right-4 space-y-2 z-50">
                 {cookNotifications.map(n => (
                     <div key={n.id} className="bg-blue-500 text-white p-4 rounded-lg shadow-xl text-lg font-semibold min-w-80">
                         🍳 {n.message}
@@ -28,3 +37,4 @@ const CookNotification = () => {
 };
 
 export default CookNotification;
+

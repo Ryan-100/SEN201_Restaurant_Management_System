@@ -15,6 +15,7 @@ import ModalServer from '../../ui/ModalServer'
 import ServerTables from './components/ServerTables'
 import ActiveBills from './components/ActiveBills'
 import ReadyForPickup from './components/ReadyForPickup'
+import ServerNotification from '../../ui/shared/ServerNotification'
 
 /**
  * Server dashboard for managing restaurant tables and orders
@@ -258,6 +259,7 @@ const ServerView = () => {
         onSubmitOrder={handleSubmitOrder}
         isEditing={currentOrderId !== null}
       />
+      <ServerNotification />
     </div>
   )
 }
