@@ -100,9 +100,6 @@ const InstallPrompt = () => {
     sessionStorage.setItem('pwa-prompt-dismissed', 'true');
   };
 
-  // Desktop download is disabled for this submission (no external download links)
-  const handleDesktopDownload = () => {};
-
   // Don't show if already installed or dismissed this session
   if (isInstalled || !showInstallPrompt || sessionStorage.getItem('pwa-prompt-dismissed') === 'true') {
     return null;
