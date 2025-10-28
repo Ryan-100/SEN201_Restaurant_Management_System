@@ -32,6 +32,15 @@ const CookView = () => {
     .filter(order => order.items.length > 0) // Only show orders that have active items
     .sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0))
 
+  // Calculate accepted items count by name
+  const acceptedItemsCount = activeOrders
+    .flatMap(order => order.items.filter(item => item.status === 'Accepted'))
+    .reduce((count, item) => {
+      const itemName = item.name || `Item ${item.id}`
+      count[itemName] = (count[itemName] || 0) + 1
+      return count
+    }, {})
+
   const handleMarkReady = (orderId, itemId) => {
     markItemReady(orderId, itemId) // This will trigger server notification
   }
@@ -40,9 +49,33 @@ const CookView = () => {
     acceptOrderItem(orderId, itemId)
   }
 
+  const handleAcceptAll = (order) => {
+    // Accept all pending items for this order
+    order.items.forEach(item => {
+      if (item.status !== 'Accepted') {
+        acceptOrderItem(item.orderId, item.id)
+      }
+    })
+  }
+
   return (
     <div className="p-6 space-y-6">
       <h1 className="text-2xl font-bold">Kitchen Queue</h1>
+
+      {/* Order Count Summary Card */}
+      {Object.keys(acceptedItemsCount).length > 0 && (
+        <Card className="bg-blue-50 border-blue-200">
+          <h2 className="text-lg font-semibold mb-3 text-blue-900">Accepted Orders Summary</h2>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+            {Object.entries(acceptedItemsCount).map(([itemName, count]) => (
+              <div key={itemName} className="bg-white rounded-md p-3 border border-blue-200">
+                <p className="text-sm text-gray-600">Total {itemName}:</p>
+                <p className="text-2xl font-bold text-blue-700">{count}</p>
+              </div>
+            ))}
+          </div>
+        </Card>
+      )}
 
       {activeOrders.length === 0 ? (
         <Card>
@@ -59,6 +92,19 @@ const CookView = () => {
                 </div>
                 <span className="text-xs px-2 py-1 rounded bg-blue-100 text-blue-700 font-medium">{order.status}</span>
               </div>
+
+              {/* Accept All Button */}
+              {order.items.some(item => item.status !== 'Accepted') && (
+                <div className="mb-4">
+                  <Button
+                    variant="primary"
+                    className="!py-2 !px-4 text-sm w-full"
+                    onClick={() => handleAcceptAll(order)}
+                  >
+                    ✓ Accept All Items
+                  </Button>
+                </div>
+              )}
 
               <ul className="space-y-3">
                 {order.items.map(item => (
