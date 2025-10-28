@@ -18,9 +18,17 @@ const __dirname = path.dirname(__filename);
 const isDev = process.env.ELECTRON_START_URL != null;
 
 function createMainWindow() {
+  // Use smaller window in dev mode to test responsive features
+  // 600px width triggers mobile breakpoints (< 768px md breakpoint)
+  const windowWidth = isDev ? 600 : 1200;
+  const windowHeight = isDev ? 800 : 800;
+  
   const mainWindow = new BrowserWindow({
-    width: 1200,
-    height: 800,
+    width: windowWidth,
+    height: windowHeight,
+    minWidth: 400,
+    minHeight: 600,
+    resizable: true,
     webPreferences: {
       contextIsolation: true,
       preload: path.join(__dirname, 'preload.cjs'),

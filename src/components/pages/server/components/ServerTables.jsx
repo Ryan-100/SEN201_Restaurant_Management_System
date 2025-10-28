@@ -4,10 +4,11 @@
  * Tables grid for the Server dashboard. Renders selectable table cards
  * with occupancy and selection state.
  *
- * Created by BinaryBrains, 27 October 2025
+ * Updated by Phyo, 27 October 2025
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 
 /**
  * Tables grid
@@ -60,5 +61,12 @@ const ServerTables = ({ totalTables, occupiedTables, selectedTable, onSelectTabl
 }
 
 export default ServerTables
+
+ServerTables.propTypes = {
+  totalTables: PropTypes.number.isRequired,
+  occupiedTables: PropTypes.instanceOf(Set).isRequired,
+  selectedTable: PropTypes.number,
+  onSelectTable: PropTypes.func.isRequired,
+}
 
 
