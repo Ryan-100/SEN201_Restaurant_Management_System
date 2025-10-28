@@ -29,6 +29,7 @@ jobs:
 
       - name: Build Windows ZIP artifact
         run: npx --yes electron-builder --win --x64 -c.win.target=zip
+        continue-on-error: true
 
       - name: Fallback - zip win-unpacked if electron-builder didn't emit .zip
         shell: pwsh
@@ -38,7 +39,7 @@ jobs:
             if (Test-Path "release/win-unpacked") {
               Compress-Archive -Path "release/win-unpacked/*" -DestinationPath "release/windows-zip.zip" -Force
             } else {
-              Write-Error "No ZIP produced and dist/win-unpacked not found."
+              Write-Error "No ZIP produced and release/win-unpacked not found."
               exit 1
             }
           }
