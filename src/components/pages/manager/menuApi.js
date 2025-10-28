@@ -2,7 +2,6 @@
  * menuApi.js
  *
  * This utility file provides functions for interacting with the menu-related endpoints.
- * It uses mock data during development and will be updated to make real HTTP requests.
  *
  * Created by Grace (Shinn Thant Khin), 07 October 2025
  */
@@ -19,21 +18,14 @@ const saveMenuToLocalStorage = () => {
   }
 };
 
-/**
- * Fetches all menu items.
- * @returns {Promise<Array>} A promise that resolves to an array of menu items.
- */
+// Fetches all menu items.
 export const getMenuItems = async () => {
   console.log("Fetching menu items...");
   await new Promise(resolve => setTimeout(resolve, 500));
   return Promise.resolve([...menuItems]);
 };
 
-/**
- * Creates a new menu item.
- * @param {object} itemData - The data for the new item.
- * @returns {Promise<object>} A promise resolving to the new item.
- */
+// Creates a new menu item.
 export const createMenuItem = async (itemData) => {
   console.log("Creating new menu item...", itemData);
   await new Promise(resolve => setTimeout(resolve, 500));
@@ -49,12 +41,7 @@ export const createMenuItem = async (itemData) => {
   return Promise.resolve(newItem);
 };
 
-/**
- * Updates an existing menu item.
- * @param {string} itemId - The ID of the item to update.
- * @param {object} itemData - The updated data.
- * @returns {Promise<object>} A promise resolving to the updated item.
- */
+//Updates an existing menu item.
 export const updateMenuItem = async (itemId, itemData) => {
   console.log(`Updating menu item ${itemId}...`, itemData);
   await new Promise(resolve => setTimeout(resolve, 500));
@@ -69,11 +56,9 @@ export const updateMenuItem = async (itemId, itemData) => {
   return Promise.resolve(updatedItem);
 };
 
-/**
- * Deletes a menu item by its ID.
- * @param {string} itemId - The unique ID of the item to delete.
- * @returns {Promise<void>} A promise that resolves when the operation is complete.
- */
+
+// Deletes a menu item by its ID.
+
 export const deleteMenuItem = async (itemId) => {
   console.log(`Deleting menu item ${itemId}...`);
   await new Promise(resolve => setTimeout(resolve, 500));

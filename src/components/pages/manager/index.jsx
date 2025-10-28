@@ -36,6 +36,7 @@ const ManagerView = () => {
   const [endDate, setEndDate] = useState(getTodayDateString());
   const [reportData, setReportData] = useState(null);
   const [summary, setSummary] = useState(null);
+  const [reportError, setReportError] = useState(null);
 
   const handleShowAddModal = () => {
     setSelectedItem(null);
@@ -66,12 +67,25 @@ const ManagerView = () => {
   };
 
   const handleGenerateReport = useCallback(() => {
+
+    setReportError(null);
+    setReportData(null);
+    setSummary(null);
+
     if (!startDate || !endDate) {
+      setReportError('Please select a start and end date');
       return;
     }
+
     const start = new Date(startDate);
-    start.setHours(0, 0, 0, 0);
     const end = new Date(endDate);
+
+    if (end < start) {
+      setReportError('End date must be after start date');
+      return;
+    }
+
+    start.setHours(0, 0, 0, 0);
     end.setHours(23, 59, 59, 999);
 
     const filteredOrders = orders.filter(order =>
@@ -89,7 +103,7 @@ const ManagerView = () => {
 
   useEffect(() => {
     handleGenerateReport();
-  }, [handleGenerateReport]);
+  }, []);
 
   return (
     <div className="space-y-6">
@@ -143,7 +157,10 @@ const ManagerView = () => {
               type="date"
               id="start-date"
               value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
+              onChange={(e) => {
+                setStartDate(e.target.value);
+                setReportError(null);
+              }}
               className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
             />
           </div>
@@ -153,7 +170,10 @@ const ManagerView = () => {
               type="date"
               id="end-date"
               value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
+              onChange={(e) => {
+                setEndDate(e.target.value);
+                setReportError(null);
+              }}
               className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
             />
           </div>
@@ -163,6 +183,12 @@ const ManagerView = () => {
             </button>
           </div>
         </div>
+
+        {reportError && 
+          <p className="w-full text-center text-red-600 text-sm mt-2 mb-2">
+            {reportError}
+          </p>
+        }
 
         {summary && reportData && (
           <div>
