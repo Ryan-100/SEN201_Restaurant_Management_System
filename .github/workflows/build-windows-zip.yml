@@ -28,7 +28,20 @@ jobs:
         run: npm run build
 
       - name: Build Windows ZIP artifact
-        run: npx --yes electron-builder --win zip
+        run: npx --yes electron-builder --win --x64 -c.win.target=zip
+
+      - name: Fallback - zip win-unpacked if electron-builder didn't emit .zip
+        shell: pwsh
+        run: |
+          $zip = Get-ChildItem -Path "dist" -Filter "*.zip" -ErrorAction SilentlyContinue
+          if (-not $zip) {
+            if (Test-Path "dist/win-unpacked") {
+              Compress-Archive -Path "dist/win-unpacked/*" -DestinationPath "dist/windows-zip.zip" -Force
+            } else {
+              Write-Error "No ZIP produced and dist/win-unpacked not found."
+              exit 1
+            }
+          }
 
       - name: Upload Windows ZIP
         uses: actions/upload-artifact@v4
