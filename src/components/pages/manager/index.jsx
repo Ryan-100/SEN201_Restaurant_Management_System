@@ -95,9 +95,9 @@ const ManagerView = () => {
     <div className="space-y-6">
       {/* Menu Management Section */}
       <div className="p-4 bg-white rounded-lg shadow-md">
-        <div className="flex justify-between items-center mb-4">
+        <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-4">
           <h1 className="text-2xl font-bold text-gray-800">Menu Management</h1>
-          <button onClick={handleShowAddModal} className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">
+          <button onClick={handleShowAddModal} className="w-full sm:w-auto px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">
             Add New Item
           </button>
         </div>
@@ -157,7 +157,7 @@ const ManagerView = () => {
               className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
             />
           </div>
-          <div className="self-end">
+          <div className="w-full sm:w-auto self-end">
             <button onClick={handleGenerateReport} className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
               Generate Report
             </button>

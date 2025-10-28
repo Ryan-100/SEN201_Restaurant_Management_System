@@ -89,9 +89,9 @@ const MenuManager = () => {
   // --- COMPONENT RENDER ---
   return (
     <div className="p-4 bg-white rounded-lg shadow-md">
-      <div className="flex justify-between items-center mb-4">
+      <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-4">
         <h1 className="text-2xl font-bold text-gray-800">Menu Management</h1>
-        <button onClick={handleShowAddModal} className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">
+        <button onClick={handleShowAddModal} className="w-full sm:w-auto px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">
           Add New Item
         </button>
       </div>
@@ -117,10 +117,10 @@ const MenuManager = () => {
                   <td className="py-2 px-4">{item.category}</td>
                   <td className="py-2 px-4">${item.price.toFixed(2)}</td>
                   <td className="py-2 px-4 space-x-2">
-                    <button onClick={() => handleShowEditModal(item)} className="text-blue-500 hover:underline">
+                    <button onClick={() => handleShowEditModal(item)} className="px-3 py-1 text-sm text-white bg-blue-600 rounded-md hover:bg-blue-700">
                       Edit
                     </button>
-                    <button onClick={() => handleDeleteItem(item.id, item.name)} className="text-red-500 hover:underline">
+                    <button onClick={() => handleDeleteItem(item.id, item.name)} className="px-3 py-1 text-sm text-white bg-red-600 rounded-md hover:bg-red-700">
                       Delete
                     </button>
                   </td>
