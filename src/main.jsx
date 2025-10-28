@@ -16,9 +16,10 @@ import './index.css';
 import App from './App.jsx';
 import { AppProvider } from './contexts/AppContext.jsx';
 
-// Disable SW in Electron (file:// origins) to avoid scope errors
+// Disable SW in Electron and during development to avoid stale caches
 const isElectron = typeof window !== 'undefined' && !!window.desktop;
-if (!isElectron && 'serviceWorker' in navigator) {
+const isProd = typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.PROD;
+if (!isElectron && isProd && 'serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js')
       .then((registration) => {
