@@ -7,6 +7,7 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import Button from '../../../ui/Button'
 import Card from '../../../ui/Card'
 
@@ -28,7 +29,7 @@ const ReadyForPickup = ({ readyItemsByTable, expandedTables, onToggleExpanded, o
   return (
     <div className="space-y-3 max-h-[calc(100vh-200px)] overflow-y-auto">
       {entries.map(([tableNum, items]) => {
-        const tableNumInt = parseInt(tableNum, 10)
+        const tableNumInt = Number.parseInt(tableNum, 10)
         const isExpanded = expandedTables.has(tableNumInt)
         return (
           <Card key={tableNum} className="p-0 overflow-hidden border-l-4 border-yellow-500">
@@ -74,17 +75,7 @@ const ReadyForPickup = ({ readyItemsByTable, expandedTables, onToggleExpanded, o
                     </Button>
                   </div>
                 ))}
-                <div className="border-t border-gray-200 pt-2 mt-2">
-                  <Button
-                    variant="success"
-                    onClick={() => {
-                      items.forEach(item => onServeItem(item.orderId, item.id))
-                    }}
-                    className="w-full text-sm py-2"
-                  >
-                    Serve All
-                  </Button>
-                </div>
+                {/* Bottom Serve All removed (header button is sufficient) */}
               </div>
             )}
           </Card>
@@ -95,5 +86,12 @@ const ReadyForPickup = ({ readyItemsByTable, expandedTables, onToggleExpanded, o
 }
 
 export default ReadyForPickup
+
+ReadyForPickup.propTypes = {
+  readyItemsByTable: PropTypes.object.isRequired,
+  expandedTables: PropTypes.instanceOf(Set).isRequired,
+  onToggleExpanded: PropTypes.func.isRequired,
+  onServeItem: PropTypes.func.isRequired,
+}
 
 
