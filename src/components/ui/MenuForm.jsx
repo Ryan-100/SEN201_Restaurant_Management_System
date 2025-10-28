@@ -59,11 +59,11 @@ const MenuForm = ({ onSubmit, onClose, itemToEdit = null }) => {
         required
       />
 
-      <div className="flex justify-end space-x-3 pt-2">
-        <button type="button" onClick={onClose} className="px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400">
+      <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 pt-2">
+        <button type="button" onClick={onClose} className="w-full sm:w-auto px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400">
           Cancel
         </button>
-        <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+        <button type="submit" className="w-full sm:w-auto px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
           {itemToEdit ? 'Save Changes' : 'Add Item'}
         </button>
       </div>

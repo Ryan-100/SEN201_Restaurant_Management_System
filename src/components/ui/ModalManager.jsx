@@ -17,7 +17,7 @@ const ModalManager = ({ isOpen, onClose, children }) => {
 
   return (
     <div
-      className="fixed inset-0 bg-black/70 flex justify-center items-center z-50"
+      className="fixed inset-0 bg-black/70 flex justify-center items-center z-50 p-4 overflow-y-auto"
       onClick={onClose}
     >
       <div
