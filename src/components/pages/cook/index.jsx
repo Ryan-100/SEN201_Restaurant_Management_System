@@ -1,8 +1,16 @@
+/**
+ * CookView.jsx
+ *
+ * Kitchen screen that shows active orders and allows cooks to accept, mark ready, and cancel items.
+ *
+ * Created by Ko Sett, 6 October 2025
+ */
+
 import React from 'react'
 import Card from '../../ui/Card'
 import Button from '../../ui/Button'
 import { useAppContext } from '../../../contexts/AppContext'
-import ServerNotification from '../../ui/shared/ServerNotification'
+import CookNotification from '../../ui/shared/CookNotification'
 
 const CookView = () => {
   const { orders, cancelOrderItem, markItemReady, acceptOrderItem } = useAppContext()
@@ -68,8 +76,6 @@ const CookView = () => {
                       <div className="flex items-center gap-2">
                         <span className={`text-xs px-2 py-1 rounded ${
                           item.status === 'Accepted' ? 'bg-blue-100 text-blue-700' : 
-                          item.status === 'Ready' ? 'bg-green-100 text-green-700' : 
-                          item.status === 'Cancelled' ? 'bg-red-100 text-red-700' : 
                           'bg-gray-100 text-gray-700'
                         }`}>
                           {item.status || 'Pending'}
@@ -91,7 +97,7 @@ const CookView = () => {
                       <Button
                         variant="success"
                         className="!py-1 !px-3 text-sm"
-                        disabled={item.status === 'Ready' || item.status !== 'Accepted'}
+                        disabled={item.status !== 'Accepted'}
                         onClick={() => handleMarkReady(item.orderId, item.id)}
                       >
                         Mark Ready
@@ -100,7 +106,6 @@ const CookView = () => {
                       <Button
                         variant="danger"
                         className="!py-1 !px-3 text-sm"
-                        disabled={item.status === 'Cancelled' || item.status === 'Ready' || item.status === 'Accepted'}
                         onClick={() => cancelOrderItem(item.orderId, item.id)}
                       >
                         Cancel
@@ -113,7 +118,7 @@ const CookView = () => {
           ))}
         </div>
       )}
-      <ServerNotification />
+      <CookNotification />
     </div>
   )
 }
