@@ -3,10 +3,11 @@
  *
  * Active bills list for the Server dashboard.
  *
- * Created by BinaryBrains, 27 October 2025
+ * Updated by Phyo, 27 October 2025
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import Button from '../../../ui/Button'
 import Card from '../../../ui/Card'
 
@@ -70,5 +71,17 @@ const ActiveBills = ({ orders, onViewEdit, onDeliverBill, canDeliverBill, calcul
 }
 
 export default ActiveBills
+
+ActiveBills.propTypes = {
+  orders: PropTypes.arrayOf(PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    tableNumber: PropTypes.number.isRequired,
+    items: PropTypes.array
+  })).isRequired,
+  onViewEdit: PropTypes.func.isRequired,
+  onDeliverBill: PropTypes.func.isRequired,
+  canDeliverBill: PropTypes.func.isRequired,
+  calculateOrderTotal: PropTypes.func.isRequired,
+}
 
 

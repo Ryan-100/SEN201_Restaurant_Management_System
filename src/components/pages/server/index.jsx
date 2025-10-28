@@ -208,7 +208,7 @@ const ServerView = () => {
           <p className="text-gray-600 mt-1">Select a table to take or edit orders</p>
         </div>
 
-        <div className="flex gap-6">
+        <div className="flex flex-col lg:flex-row gap-6">
           <div className="flex-1">
             <ServerTables
               totalTables={TOTAL_TABLES}
@@ -232,8 +232,8 @@ const ServerView = () => {
             </div>
           </div>
 
-          <div className="w-96">
-            <Card className="sticky top-6">
+          <div className="w-full lg:w-96">
+            <Card className="lg:sticky lg:top-6">
               <h2 className="text-xl font-semibold text-gray-800 mb-4">Ready for Pickup</h2>
               
               <ReadyForPickup
