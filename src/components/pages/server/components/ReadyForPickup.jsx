@@ -3,7 +3,7 @@
  *
  * Panel listing items marked Ready, grouped by table, with Serve/Serve All.
  *
- * Created by BinaryBrains, 27 October 2025
+ * Created by Phyo, 27 October 2025
  */
 
 import React from 'react'
@@ -40,7 +40,18 @@ const ReadyForPickup = ({ readyItemsByTable, expandedTables, onToggleExpanded, o
                 <div className="font-semibold text-gray-800">Table {tableNum}</div>
                 <div className="text-sm text-gray-600">{items.length} item{items.length !== 1 ? 's' : ''} ready</div>
               </div>
-              <span className="text-gray-600 text-lg">{isExpanded ? '▼' : '▶'}</span>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    items.forEach(item => onServeItem(item.orderId, item.id))
+                  }}
+                  className="bg-green-600 hover:bg-green-700 text-white text-xs px-2 py-1 rounded"
+                >
+                  Serve All
+                </button>
+                <span className="text-gray-600 text-lg">{isExpanded ? '▼' : '▶'}</span>
+              </div>
             </button>
 
             {isExpanded && (
