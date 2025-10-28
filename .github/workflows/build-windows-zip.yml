@@ -33,10 +33,10 @@ jobs:
       - name: Fallback - zip win-unpacked if electron-builder didn't emit .zip
         shell: pwsh
         run: |
-          $zip = Get-ChildItem -Path "dist" -Filter "*.zip" -ErrorAction SilentlyContinue
+          $zip = Get-ChildItem -Path "release" -Filter "*.zip" -ErrorAction SilentlyContinue
           if (-not $zip) {
-            if (Test-Path "dist/win-unpacked") {
-              Compress-Archive -Path "dist/win-unpacked/*" -DestinationPath "dist/windows-zip.zip" -Force
+            if (Test-Path "release/win-unpacked") {
+              Compress-Archive -Path "release/win-unpacked/*" -DestinationPath "release/windows-zip.zip" -Force
             } else {
               Write-Error "No ZIP produced and dist/win-unpacked not found."
               exit 1
@@ -47,7 +47,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: windows-zip
-          path: dist/*.zip
+          path: |
+            release/*.zip
+            dist/*.zip
           if-no-files-found: error
 
 
