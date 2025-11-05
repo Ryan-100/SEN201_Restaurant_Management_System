@@ -1,7 +1,7 @@
 {
   "name": "Restaurant Management System",
   "short_name": "RestaurantApp",
-  "description": "A comprehensive restaurant management system for orders, menu, and staff management",
+  "description": "A restaurant management system",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",

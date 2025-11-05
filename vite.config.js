@@ -15,7 +15,7 @@ export default defineConfig({
       manifest: {
         name: 'Restaurant Management System',
         short_name: 'RestaurantApp',
-        description: 'A comprehensive restaurant management system for orders, menu, and staff management',
+        description: 'A restaurant management system',
         theme_color: '#3b82f6',
         background_color: '#ffffff',
         display: 'standalone',
