@@ -2,7 +2,7 @@
   "name": "sen201-restaurant-management-system",
   "private": true,
   "version": "0.0.0",
-  "description": "A comprehensive restaurant management system for orders, menu, and staff management built by Aung Sett Paing (Ko Sett), Phyo Theingi (Phyo), Shinn Thant Khin (Grace), Kyaw Zin Htet (Ryan)",
+  "description": "A restaurant management system",
   "author": {
     "name": "BinaryBrains",
     "email": "khtet@cmkl.ac.th"
