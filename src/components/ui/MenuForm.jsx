@@ -6,7 +6,7 @@
  * Created by Grace (Shinn Thant Khin), 07 October 2025
  */
 
-import React, { useState} from 'react';
+import React, { useState, useEffect} from 'react';
 import PropTypes from 'prop-types';
 
 // Renders a form for adding or editing a menu item.
@@ -16,6 +16,16 @@ const MenuForm = ({ onSubmit, onClose, itemToEdit = null }) => {
     price: itemToEdit?.price || '',
   });
 
+  const [errors, setErrors] = useState({});
+
+  useEffect(() => {
+    setFormData({
+      name: itemToEdit?.name || '',
+      price: itemToEdit?.price || '',
+    });
+    setErrors({});
+  }, [itemToEdit]);
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -23,41 +33,55 @@ const MenuForm = ({ onSubmit, onClose, itemToEdit = null }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!formData.name|| !formData.price) {
-      alert('Name and Price are required.');
-      return;
+    const validationErrors = {};
+    if (!formData.name.trim()) {
+      validationErrors.name = 'Menu item name is required';
     }
+    if (!formData.price.toString().trim()) {
+      validationErrors.price = 'Menu item price is required';
+    } else if (isNaN(Number(formData.price))) {
+      validationErrors.price = 'Menu item price must be a number';
+    } else if (Number(formData.price) <= 0) {
+      validationErrors.price = 'Menu item price must be greater than 0';
+    }
+    setErrors(validationErrors);
 
-    const submissionData = {
-      name: formData.name,
-      price: parseFloat(formData.price),
-    };
-    onSubmit(submissionData);
+    if (Object.keys(validationErrors).length === 0) {
+      const submissionData = {
+        name: formData.name.trim(),
+        price: parseFloat(formData.price),
+      };
+      onSubmit(submissionData);
+    }
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <h2 className="text-2xl font-bold text-gray-800">{itemToEdit ? 'Edit Menu Item' : 'Add New Menu Item'}</h2>
       
-      <input
-        type="text"
-        name="name"
-        placeholder="Item Name"
-        value={formData.name}
-        onChange={handleInputChange}
-        className="w-full p-2 border border-gray-300 rounded-md"
-        required
-      />
+      <div>
+        <input
+          type="text"
+          name="name"
+          placeholder="Menu Item Name"
+          value={formData.name}
+          onChange={handleInputChange}
+          className={`w-full p-2 border border-gray-300 rounded-md ${errors.name ? 'border-red-500' : 'border-gray-300'}`}
+        />
+        {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
+      </div>
+      <div>
       <input
         type="number"
         name="price"
-        placeholder="Price"
+        placeholder="Menu Item Price"
         value={formData.price}
         onChange={handleInputChange}
-        className="w-full p-2 border border-gray-300 rounded-md"
+        className={`w-full p-2 border border-gray-300 rounded-md ${errors.price ? 'border-red-500' : 'border-gray-300'}`}
         step="0.01"
-        required
       />
+      {errors.price && <p className="text-red-500 text-sm mt-1">{errors.price}</p>}
+      </div>
 
       <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 pt-2">
         <button type="button" onClick={onClose} className="w-full sm:w-auto px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400">
